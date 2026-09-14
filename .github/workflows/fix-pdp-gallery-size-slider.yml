@@ -1,0 +1,93 @@
+name: Apply PDP gallery controls
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch product page controls
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('src/screens/ProductDetail.tsx')
+          s = p.read_text()
+          imp = "import '../styles/pdp-gallery-controls.css'\n"
+          if imp not in s:
+              marker = "import '../styles/pdp-buybox.css'\n"
+              s = s.replace(marker, marker + imp, 1)
+          old = '''                <div className="pdp-hero-stage" onClick={() => setIsFullscreen(true)}>\n                  {renderGalleryImage()}\n                </div>\n\n                {/* Thumbnails sit UNDER the stage as a single scrolling rail.'''
+          new = '''                <div className="pdp-gallery-stage-wrap">\n                  <button\n                    type="button"\n                    className="pdp-gallery-arrow pdp-gallery-arrow--prev"\n                    onClick={(e) => { e.stopPropagation(); setImgIdx((i) => (i - 1 + extra.gallery.length) % extra.gallery.length) }}\n                    aria-label="Previous product image"\n                    disabled={extra.gallery.length < 2}\n                  >\n                    <span aria-hidden="true">←</span>\n                  </button>\n                  <div className="pdp-hero-stage" onClick={() => setIsFullscreen(true)}>\n                    {renderGalleryImage()}\n                  </div>\n                  <button\n                    type="button"\n                    className="pdp-gallery-arrow pdp-gallery-arrow--next"\n                    onClick={(e) => { e.stopPropagation(); setImgIdx((i) => (i + 1) % extra.gallery.length) }}\n                    aria-label="Next product image"\n                    disabled={extra.gallery.length < 2}\n                  >\n                    <span aria-hidden="true">→</span>\n                  </button>\n                  <div className="pdp-gallery-dots" role="tablist" aria-label="Product images">\n                    {extra.gallery.map((_, i) => (\n                      <button\n                        key={i}\n                        type="button"\n                        className={`pdp-gallery-dot${i === imgIdx ? ' active' : ''}`}\n                        onClick={(e) => { e.stopPropagation(); setImgIdx(i) }}\n                        aria-label={`View photo ${i + 1}`}\n                        aria-selected={i === imgIdx}\n                        role="tab"\n                      />\n                    ))}\n                  </div>\n                </div>\n\n                {/* Thumbnail rail retained in markup for compatibility, but hidden\n                    by PDP gallery controls so the stage owns image navigation. */'''
+          if old not in s:
+              raise SystemExit('Gallery anchor not found')
+          s = s.replace(old, new, 1)
+          p.write_text(s)
+
+      - name: Add scoped PDP control styles
+        shell: bash
+        run: |
+          cat > src/styles/pdp-gallery-controls.css <<'EOF'
+          /* Scoped PDP interaction refinements: no business logic changes. */
+          @media (min-width: 921px) {
+            .pdp-page .pdp-right-col { max-height: none !important; overflow: visible !important; overscroll-behavior: auto !important; scrollbar-width: none !important; }
+            .pdp-page .pdp-right-col::-webkit-scrollbar { display: none !important; width: 0 !important; }
+          }
+
+          .pdp-page .pdp-gallery-stage-wrap { position: relative; width: 100%; display: grid; align-items: center; }
+          .pdp-page .pdp-gallery-stage-wrap .pdp-hero-stage { position: relative; z-index: 1; }
+          .pdp-page .pdp-gallery-arrow {
+            position: absolute; top: 50%; z-index: 8; width: 52px; height: 52px; margin-top: -26px;
+            border-radius: 50%; border: 1px solid rgba(60,42,94,.14); background: rgba(255,255,255,.92);
+            color: #3c2a5e; display: grid; place-items: center; cursor: pointer;
+            box-shadow: 0 10px 24px rgba(45,30,70,.12); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            transition: transform .2s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
+          }
+          .pdp-page .pdp-gallery-arrow:hover:not(:disabled) { transform: translateY(-50%) scale(1.04); background: rgba(255,255,255,.98); box-shadow: 0 14px 28px rgba(45,30,70,.16); }
+          .pdp-page .pdp-gallery-arrow:disabled { opacity: .45; cursor: default; }
+          .pdp-page .pdp-gallery-arrow span { font-size: 24px; line-height: 1; }
+          .pdp-page .pdp-gallery-arrow--prev { left: 18px; transform: translateY(-50%); }
+          .pdp-page .pdp-gallery-arrow--next { right: 18px; transform: translateY(-50%); }
+          .pdp-page .pdp-gallery-arrow--prev:hover:not(:disabled), .pdp-page .pdp-gallery-arrow--next:hover:not(:disabled) { transform: translateY(-50%) scale(1.04); }
+          .pdp-page .pdp-gallery-dots { position: absolute; left: 50%; bottom: 18px; z-index: 8; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 999px; background: rgba(255,255,255,.72); border: 1px solid rgba(60,42,94,.10); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 8px 18px rgba(45,30,70,.08); }
+          .pdp-page .pdp-gallery-dot { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; background: rgba(60,42,94,.22); cursor: pointer; transition: transform .2s ease, background .2s ease; }
+          .pdp-page .pdp-gallery-dot.active { width: 22px; border-radius: 999px; background: #3c2a5e; }
+          .pdp-page .pdp-gallery-dot:hover { transform: scale(1.12); }
+          .pdp-page .pdp-thumb-rail { display: none !important; }
+
+          /* Size selector becomes a horizontal snap slider with a discreet scrollbar-free track. */
+          .pdp-page .pdp-size-run { display: flex !important; gap: 10px !important; overflow-x: auto !important; overflow-y: hidden !important; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 2px 2px 8px; }
+          .pdp-page .pdp-size-run::-webkit-scrollbar { display: none; }
+          .pdp-page .pdp-size-chip { flex: 0 0 min(270px, 78%); min-height: 84px; scroll-snap-align: start; }
+
+          @media (max-width: 920px) {
+            .pdp-page .pdp-right-col { max-height: none !important; overflow: visible !important; }
+          }
+          @media (max-width: 620px) {
+            .pdp-page .pdp-gallery-stage-wrap .pdp-hero-stage { min-height: 0 !important; }
+            .pdp-page .pdp-gallery-arrow { width: 46px; height: 46px; margin-top: -23px; }
+            .pdp-page .pdp-gallery-arrow--prev { left: 8px; }
+            .pdp-page .pdp-gallery-arrow--next { right: 8px; }
+            .pdp-page .pdp-gallery-arrow span { font-size: 20px; }
+            .pdp-page .pdp-gallery-dots { bottom: 12px; gap: 7px; padding: 6px 9px; }
+            .pdp-page .pdp-size-chip { flex-basis: min(280px, 84vw); min-height: 76px; }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .pdp-page .pdp-gallery-arrow, .pdp-page .pdp-gallery-dot { transition: none; }
+          }
+          EOF
+
+      - name: Commit to main
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f src/screens/ProductDetail.tsx src/styles/pdp-gallery-controls.css
+          git commit -m "fix: remove nested PDP scroll and add gallery controls" || exit 0
+          git push origin main
+          rm -f .github/workflows/fix-pdp-gallery-size-slider.yml
