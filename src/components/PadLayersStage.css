@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   PadLayersStage — the centre visual of the "Why Femi9" section
-   Only the centre changes; surrounding benefit cards remain untouched.
+   PadLayersStage — centre scroll-scrubbed product film
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .figma-landing .fl-why .fl-why__product {
@@ -14,7 +13,7 @@
 .fl-why__stage {
   position: relative;
   width: 100%;
-  aspect-ratio: var(--frame-ratio, 595 / 1240);
+  aspect-ratio: var(--frame-ratio, 360 / 640);
   margin-inline: auto;
   transform: scale(calc(1 + var(--why-explode, 0) * 0.05));
   transform-origin: 50% 50%;
@@ -38,7 +37,7 @@
 }
 
 .figma-landing .fl-why .fl-why__product .fl-why__stage img,
-.fl-why__stage canvas {
+.fl-why__stage video {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -46,13 +45,30 @@
   max-width: none;
   display: block;
   z-index: 1;
+  object-fit: contain;
   image-rendering: auto;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
 }
 
-.figma-landing .fl-why .fl-why__product .fl-why__stage[data-ready='true'] img {
+.fl-why__stage video {
   visibility: hidden;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.fl-why__stage[data-video-ready='true'] video {
+  visibility: visible;
+  opacity: 1;
+}
+
+.fl-why__stage[data-video-ready='true'] img {
+  visibility: hidden;
+}
+
+.fl-why__stage[data-video-ready='false'] video {
+  visibility: hidden;
+  opacity: 0;
 }
 
 @media (min-width: 901px) {
