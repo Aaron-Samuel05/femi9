@@ -8,6 +8,7 @@ import '../styles/pdp-motion.css'
 // Last of the PDP sheets: the buy block's Lumi9 layout has to outrank both
 // app.css and craft-product.css, and does it on scope rather than !important.
 import '../styles/pdp-buybox.css'
+import '../styles/pdp-gallery-controls.css'
 import { useEffect, useState, type CSSProperties, type FormEvent } from 'react'
 import { Link, useRouter } from '@/lib/router-compat'
 import { rupees, CADENCES } from '../data/products'
@@ -420,11 +421,45 @@ export function ProductDetail({ product, extra, reviews, relatedProducts, sizeOp
             {/* LEFT COLUMN — STICKY SQUARE STAGE, THUMBNAIL RAIL BENEATH */}
             <div className="pdp-gallery-layout">
               <div className="pdp-stage-column">
-                <div className="pdp-hero-stage" onClick={() => setIsFullscreen(true)}>
-                  {renderGalleryImage()}
+                <div className="pdp-gallery-stage-wrap">
+                  <button
+                    type="button"
+                    className="pdp-gallery-arrow pdp-gallery-arrow--prev"
+                    onClick={(e) => { e.stopPropagation(); setImgIdx((i) => (i - 1 + extra.gallery.length) % extra.gallery.length) }}
+                    aria-label="Previous product image"
+                    disabled={extra.gallery.length < 2}
+                  >
+                    <span aria-hidden="true">←</span>
+                  </button>
+                  <div className="pdp-hero-stage" onClick={() => setIsFullscreen(true)}>
+                    {renderGalleryImage()}
+                  </div>
+                  <button
+                    type="button"
+                    className="pdp-gallery-arrow pdp-gallery-arrow--next"
+                    onClick={(e) => { e.stopPropagation(); setImgIdx((i) => (i + 1) % extra.gallery.length) }}
+                    aria-label="Next product image"
+                    disabled={extra.gallery.length < 2}
+                  >
+                    <span aria-hidden="true">→</span>
+                  </button>
+                  <div className="pdp-gallery-dots" role="tablist" aria-label="Product images">
+                    {extra.gallery.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        className={`pdp-gallery-dot${i === imgIdx ? ' active' : ''}`}
+                        onClick={(e) => { e.stopPropagation(); setImgIdx(i) }}
+                        aria-label={`View photo ${i + 1}`}
+                        aria-selected={i === imgIdx}
+                        role="tab"
+                      />
+                    ))}
+                  </div>
                 </div>
 
-                {/* Thumbnails sit UNDER the stage as a single scrolling rail.
+                {/* Thumbnail rail retained in markup for compatibility, but hidden
+                    by PDP gallery controls so the stage owns image navigation. */
                     They used to be a fixed vertical stack beside it, which is
                     what forced a second, unrelated image into the column below
                     the stage to square the two heights off. One rail, one
