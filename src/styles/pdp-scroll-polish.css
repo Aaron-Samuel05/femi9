@@ -1,0 +1,29 @@
+/* PDP scroll polish: one document scrollbar, no nested configurator scrolling. */
+
+@media (min-width: 921px) {
+  .pdp-page .pdp-grid,
+  .pdp-page .pdp-main-content,
+  .pdp-page .pdp-main-content > .wrap {
+    overflow: visible !important;
+  }
+
+  .pdp-page .pdp-right-col {
+    position: relative !important;
+    top: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    overflow-y: visible !important;
+    overflow-x: visible !important;
+  }
+
+  /* The gallery stays sticky; the configuration follows the normal page flow. */
+  .pdp-page .pdp-stage-column {
+    position: sticky !important;
+    top: calc(var(--nav-h) + 18px) !important;
+    height: max-content !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
