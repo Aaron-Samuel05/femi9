@@ -1,10 +1,10 @@
 'use client'
 
-import { useCallback, useEffect, useRef, type CSSProperties } from 'react'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import './PadLayersStage.css'
 
 const VIDEO_SRC = '/assets/pad-scroll-360.mp4'
-const FALLBACK_FRAME = '/assets/pad-frames-cutout/frame-090.webp'
+const POSTER_SRC = '/assets/pad-frames-cutout/frame-001.webp'
 const VIDEO_W = 360
 const VIDEO_H = 640
 
@@ -21,108 +21,81 @@ function explodeAt(progress: number) {
 export function PadLayersStage() {
   const stageRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const fallbackRef = useRef<HTMLImageElement>(null)
-  const lastTime = useRef(-1)
-  const rafRef = useRef(0)
-
-  const setScrollFrame = useCallback(() => {
-    const stage = stageRef.current
-    const video = videoRef.current
-    if (!stage || !video || !Number.isFinite(video.duration) || video.duration <= 0) return
-
-    const rect = stage.getBoundingClientRect()
-    const height = stage.offsetHeight || rect.height
-    const vh = window.innerHeight
-    const progress = clamp01((vh - rect.top) / (vh + height))
-    const time = progress * video.duration
-
-    if (Math.abs(time - lastTime.current) > 1 / 120) {
-      video.currentTime = time
-      lastTime.current = time
-    }
-    stage.style.setProperty('--why-explode', explodeAt(progress).toFixed(3))
-  }, [])
+  const rafRef = useRef<number | null>(null)
+  const lastTimeRef = useRef(-1)
+  const mountedRef = useRef(false)
+  const loadedRef = useRef(false)
 
   useEffect(() => {
     const stage = stageRef.current
     const video = videoRef.current
     if (!stage || !video) return
 
-    let destroyed = false
-    let listening = false
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
+    mountedRef.current = true
 
-    const schedule = () => {
-      if (rafRef.current || destroyed) return
-      rafRef.current = requestAnimationFrame(() => {
-        rafRef.current = 0
-        if (!destroyed) setScrollFrame()
-      })
+    const update = () => {
+      if (!mountedRef.current) return
+
+      const rect = stage.getBoundingClientRect()
+      const height = stage.offsetHeight || rect.height
+      const vh = window.innerHeight || 1
+
+      // The entire visual state is driven by where the stage sits in the
+      // viewport. This works with normal scrolling and smooth-scroll libraries
+      // because getBoundingClientRect() reflects the actual rendered position.
+      const progress = clamp01((vh * 0.78 - rect.top) / (vh * 0.9 + height))
+      stage.style.setProperty('--why-explode', explodeAt(progress).toFixed(3))
+
+      if (loadedRef.current && Number.isFinite(video.duration) && video.duration > 0) {
+        const nextTime = Math.min(video.duration - 0.001, Math.max(0, progress * video.duration))
+        if (Math.abs(nextTime - lastTimeRef.current) > 1 / 45) {
+          try {
+            video.currentTime = nextTime
+            lastTimeRef.current = nextTime
+          } catch {
+            // A seek can briefly fail while the browser is opening a media range.
+          }
+        }
+      }
+
+      rafRef.current = window.requestAnimationFrame(update)
     }
 
-    const onScroll = () => schedule()
-    const onLoaded = () => {
+    const markReady = () => {
+      if (!Number.isFinite(video.duration) || video.duration <= 0) return
+      loadedRef.current = true
       stage.dataset.videoReady = 'true'
-      const fallback = fallbackRef.current
-      if (fallback) fallback.hidden = true
-      if (reduced.matches) {
-        video.currentTime = video.duration
-        lastTime.current = video.duration
-      } else {
-        schedule()
-      }
+      stage.dataset.videoError = 'false'
     }
-    const onError = () => {
+
+    const markError = () => {
+      loadedRef.current = false
       stage.dataset.videoReady = 'false'
-      const fallback = fallbackRef.current
-      if (fallback) fallback.hidden = false
-    }
-    const onMotion = () => {
-      if (reduced.matches && Number.isFinite(video.duration) && video.duration > 0) {
-        video.currentTime = video.duration
-        lastTime.current = video.duration
-      } else {
-        schedule()
-      }
-    }
-    const listen = (on: boolean) => {
-      if (on === listening) return
-      listening = on
-      if (on) document.addEventListener('scroll', onScroll, { passive: true, capture: true })
-      else document.removeEventListener('scroll', onScroll, { capture: true })
+      stage.dataset.videoError = 'true'
     }
 
     video.muted = true
     video.playsInline = true
-    video.addEventListener('loadedmetadata', onLoaded)
-    video.addEventListener('canplay', onLoaded)
-    video.addEventListener('error', onError)
-    reduced.addEventListener('change', onMotion)
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const visible = entry.isIntersecting
-        listen(visible)
-        if (visible) schedule()
-      },
-      { rootMargin: '900px 0px' },
-    )
-    observer.observe(stage)
+    video.preload = 'auto'
+    video.addEventListener('loadedmetadata', markReady)
+    video.addEventListener('loadeddata', markReady)
+    video.addEventListener('canplay', markReady)
+    video.addEventListener('error', markError)
 
     video.load()
+    rafRef.current = window.requestAnimationFrame(update)
 
     return () => {
-      destroyed = true
-      observer.disconnect()
-      listen(false)
-      video.removeEventListener('loadedmetadata', onLoaded)
-      video.removeEventListener('canplay', onLoaded)
-      video.removeEventListener('error', onError)
-      reduced.removeEventListener('change', onMotion)
-      cancelAnimationFrame(rafRef.current)
+      mountedRef.current = false
+      loadedRef.current = false
+      video.removeEventListener('loadedmetadata', markReady)
+      video.removeEventListener('loadeddata', markReady)
+      video.removeEventListener('canplay', markReady)
+      video.removeEventListener('error', markError)
+      if (rafRef.current !== null) window.cancelAnimationFrame(rafRef.current)
       video.pause()
     }
-  }, [setScrollFrame])
+  }, [])
 
   return (
     <div
@@ -133,8 +106,8 @@ export function PadLayersStage() {
       style={{ '--frame-ratio': `${VIDEO_W} / ${VIDEO_H}` } as CSSProperties}
     >
       <img
-        ref={fallbackRef}
-        src={FALLBACK_FRAME}
+        className="fl-why__poster"
+        src={POSTER_SRC}
         alt=""
         width={VIDEO_W}
         height={VIDEO_H}
@@ -144,7 +117,7 @@ export function PadLayersStage() {
         ref={videoRef}
         className="fl-why__video"
         src={VIDEO_SRC}
-        poster={FALLBACK_FRAME}
+        poster={POSTER_SRC}
         width={VIDEO_W}
         height={VIDEO_H}
         playsInline
