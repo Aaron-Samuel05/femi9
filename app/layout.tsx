@@ -56,6 +56,10 @@ import '@/styles/f9dash.css'
 // The Lumi9 scroll. Attribute-driven and JS-armed, so it can only ever add an
 // entrance — it never hides server-rendered markup. See ScrollMotion.tsx.
 import '@/styles/motion.css'
+// Final mobile-only repair layer. Keep this last: craft-nav.css currently uses
+// !important on several header rules, so the phone-specific fixes must win the
+// cascade without touching the desktop presentation.
+import '@/styles/mobile-polish.css'
 
 import { Providers } from './providers'
 import { optSrc, optSrcSet } from '@/components/OptImg'
@@ -133,7 +137,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           fetchPriority="high"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Urbanist:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Urbanist:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,0;1,6..72,300;1,6..72,400&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
         <script
