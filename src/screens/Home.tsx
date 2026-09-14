@@ -150,7 +150,7 @@ function Hero() {
     }
   }, [])
 
-  const buyNow = () => document.querySelector('#products')?.scrollIntoView({ behavior: 'smooth' })
+  const buyNow = () => { window.location.href = '/product/p330dw' }
 
   const imgRef = useRef<HTMLImageElement>(null)
 

@@ -303,3 +303,17 @@
     grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
   }
 }
+
+
+/* FINAL: disable nested PDP scrolling; let the document own vertical scroll. */
+@media (min-width:921px) {
+  .pdp-page .pdp-right-col {
+    position: static !important;
+    top: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overscroll-behavior: auto !important;
+    scrollbar-width: auto !important;
+  }
+  .pdp-page .pdp-right-col::-webkit-scrollbar { width: auto; }
+}
