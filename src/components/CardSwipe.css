@@ -1,10 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════════════════
-   CardSwipe — cover-flow product carousel (see CardSwipe.tsx)
-
-   The product cards keep their own inline styling. This sheet only lays out the
-   stage the cards stand on and styles the controls. Card poses (x, y, rotation,
-   scale, opacity, z-index) are written by the component, frame by frame.
-   ═══════════════════════════════════════════════════════════════════════════ */
+/* CardSwipe — cover-flow product carousel */
 
 .f9-cf {
   position: relative;
@@ -21,24 +15,18 @@
   border-radius: 24px;
 }
 
-/* Clips sideways only: cards peeking past the edge never widen the page, while
-   the tilted neighbours and the active card's shadow keep their vertical room. */
 .f9-cf__viewport {
   overflow-x: clip;
   overflow-y: visible;
 }
 
-/* Every card sits in the same grid cell, centred. The row is as tall as the
-   tallest card, so the stage needs no measuring, and cards stretch to match. */
 .f9-cf__stage {
-  /* Wide enough for the details and the product image side by side. */
   --cf-card-w: clamp(540px, 46vw, 680px);
   display: grid;
   grid-template-areas: 'stack';
   justify-items: center;
   align-items: stretch;
   padding-block: 8px 32px;
-  /* Vertical page scroll stays with the browser; horizontal swipes are ours. */
   touch-action: pan-y;
   cursor: grab;
   user-select: none;
@@ -60,9 +48,6 @@
   backface-visibility: hidden;
 }
 
-/* Side cards recede by washing toward the white page (see POSE.veil). The slide's
-   transform makes it a stacking context, so this z-index only has to clear the
-   card's own badges (z-index 2). */
 .f9-cf__slide::after {
   content: '';
   position: absolute;
@@ -82,10 +67,6 @@
   -webkit-user-drag: none;
 }
 
-/* Hover on the showcased card (mouse only): the card lifts a few pixels and
-   the product rises a touch inside it. The slide's own transform belongs to
-   the carousel motion, so these move the card and image INSIDE the slide and
-   never touch it. Off while dragging, and off with reduced motion. */
 @media (hover: hover) and (pointer: fine) {
   .f9-cf__slide.is-active:hover .f9-carousel-card {
     transform: translateY(-4px);
@@ -107,21 +88,6 @@
   }
 }
 
-/* Phone: the showcased card owns the width; neighbours peek in at the edges. */
-@media (max-width: 640px) {
-  .f9-cf__stage {
-    --cf-card-w: min(74vw, 320px);
-  }
-}
-
-/* ── Card layout ───────────────────────────────────────────────────────────
-   The card's colours and type stay inline in CardSwipe.tsx; only its layout
-   lives here, because it changes with the width.
-
-   Phone (stacked): the product image on top, the details below it.
-   641px and up: the details on the left, the product image on the right. The
-   image column runs the full height of the card, so the product is the largest
-   thing in it; the price and Buy Now sit at the foot of the details. */
 .f9-carousel-card {
   display: flex;
   flex-direction: column;
@@ -184,14 +150,14 @@
   border: 0;
 }
 
-/* ── Controls ─────────────────────────────────────────────────────────────── */
-
 .f9-cf__controls {
   margin-top: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 8px;
+  position: relative;
+  z-index: 20;
 }
 
 .f9-cf__dots {
@@ -208,20 +174,12 @@
   border-radius: 999px;
   background: rgba(60, 42, 94, 0.2);
   cursor: pointer;
-  transition:
-    width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-    background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .f9-cf__dot.is-active {
   width: 28px;
   background: #3c2a5e;
-}
-
-@media (hover: hover) {
-  .f9-cf__dot:not(.is-active):hover {
-    background: rgba(60, 42, 94, 0.4);
-  }
 }
 
 .f9-cf__arrows {
@@ -243,14 +201,14 @@
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(60, 42, 94, 0.08);
-  transition:
-    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (hover: hover) {
+  .f9-cf__dot:not(.is-active):hover {
+    background: rgba(60, 42, 94, 0.4);
+  }
+
   .f9-cf__arrow:not(:disabled):hover {
     transform: translateY(-1px);
     border-color: rgba(60, 42, 94, 0.34);
@@ -273,8 +231,46 @@
   outline-offset: 3px;
 }
 
-/* Reduced motion: the component snaps instead of springing and drops the tilt;
-   the controls change state without easing. */
+/* Mobile: show only the active card. Swiping remains fully functional because
+   the stage still receives pointer gestures; the hidden neighbouring slides
+   no longer visually peek in from the sides. Controls stay below the card:
+   clickable dots on the left and clickable previous/next arrows on the right. */
+@media (max-width: 640px) {
+  .f9-cf__stage {
+    --cf-card-w: min(86vw, 600px);
+    padding-block: 8px 20px;
+  }
+
+  .f9-cf__slide:not(.is-active) {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  .f9-cf__controls {
+    margin-top: 4px;
+    padding: 0 8px;
+    min-height: 48px;
+  }
+
+  .f9-cf__dot {
+    min-width: 12px;
+    min-height: 12px;
+  }
+
+  .f9-cf__dot.is-active {
+    min-width: 30px;
+  }
+
+  .f9-cf__arrow {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    background: rgba(255, 255, 255, 0.96);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .f9-cf__dot,
   .f9-cf__arrow {
