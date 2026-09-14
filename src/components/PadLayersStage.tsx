@@ -4,40 +4,16 @@ import { useEffect, useRef, type CSSProperties } from 'react'
 import './PadLayersStage.css'
 
 /**
- * The centre of the home page's "Why Femi9" section: the Femi9 pad separating
- * into its layers as the section scrolls into view, and reassembling as it
- * scrolls away.
- *
- * The playback engine is ported from pad-exploder.js, the Web Component the
- * frame sequence was made for: one rAF-coalesced update reading fresh geometry
- * every frame, frames decoded before use with gaps borrowed from the nearest
- * loaded frame, a DPR-capped canvas, debounced resize plus an orientation
- * safety pass, live reduced-motion switching, and full cleanup on unmount.
- *
- * What the Web Component adds and this section must not have is left out: its
- * heading and numbered callouts, the scroll-hint pill and loading bar, the
- * lavender stage, and the 400vh sticky runway (a runway cannot live in a grid
- * column, and sticky does not work inside the section's overflow:hidden).
- * Instead progress comes from the stage's own pass through the viewport, so the
- * page scrolls exactly as before and the pad reassembles on the way out.
- *
- * Frames: public/assets/pad-frames-cutout holds transparent cut-outs of the
- * pad-exploder frames in public/assets/pad-frames (frame 1 = fully exploded,
- * frame 90 = closed - the component's `reverse="true"` order), so the pad sits
- * directly on the section's purple.
+ * Scroll-controlled Femi9 pad frame sequence. The artwork stays exact to the
+ * supplied product frames; scroll controls the exploded/reassembled playback.
+ * The canvas backing store is capped to the frames' native 595px width so
+ * Retina phones do not upscale the raster artwork before displaying it.
  */
-
 const FRAME_COUNT = 90
 const ASSEMBLED = FRAME_COUNT - 1
-
-/** Size of every cut-out frame, in pixels (one shared crop around the pad). */
 const FRAME_W = 595
 const FRAME_H = 1240
-
-/** Cap the canvas backing store, as pad-exploder.js does. */
 const MAX_DPR = 2
-
-/** Frames decoding at once. */
 const CONCURRENCY = 4
 
 const frameSrc = (index: number) =>
@@ -49,12 +25,6 @@ const ease = (t: number) => {
   return c * c * (3 - 2 * c)
 }
 
-/**
- * How far apart the layers are (0 = assembled, 1 = fully exploded) for the
- * stage's progress through the viewport (0 = its top reaches the bottom of the
- * screen, 1 = its bottom leaves the top): closed as it arrives, fully exploded
- * and held while it is centred on screen, closed again as it leaves.
- */
 function explodeAt(progress: number) {
   return ease((progress - 0.12) / 0.3) * (1 - ease((progress - 0.58) / 0.3))
 }
@@ -70,7 +40,6 @@ export function PadLayersStage() {
     if (!stage || !canvas || !ctx) return
 
     const reduceQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    // Phones and small screens: every second frame, half the download.
     const step = window.matchMedia('(max-width: 900px), (pointer: coarse)').matches ? 2 : 1
 
     let destroyed = false
@@ -92,8 +61,6 @@ export function PadLayersStage() {
     const snap = (index: number) =>
       index === ASSEMBLED ? ASSEMBLED : Math.min(ASSEMBLED, Math.round(index / step) * step)
 
-    /** A frame that has not arrived (or failed) borrows its nearest loaded
-     *  neighbour, so gaps degrade invisibly. */
     const nearestLoaded = (index: number) => {
       for (let d = 0; d < FRAME_COUNT; d++) {
         if (images[index - d]) return index - d
@@ -104,10 +71,9 @@ export function PadLayersStage() {
 
     const progress = () => {
       if (staticMode) return 1
-      // Fresh geometry every frame: shifts above the section never break it.
       const rect = stage.getBoundingClientRect()
       const height = stage.offsetHeight || rect.height
-      const top = rect.top + (rect.height - height) / 2 // ignore the explode scale
+      const top = rect.top + (rect.height - height) / 2
       const vh = window.innerHeight
       return explodeAt(clamp01((vh - top) / (vh + height)))
     }
@@ -126,7 +92,6 @@ export function PadLayersStage() {
       }
     }
 
-    /** Everything is coalesced into one rAF; all drawing happens inside it. */
     const schedule = () => {
       if (raf || destroyed) return
       raf = requestAnimationFrame(update)
@@ -153,7 +118,6 @@ export function PadLayersStage() {
           pump()
         }
         img.onload = () => {
-          // Decode up front so the first scrub never stutters on a lazy decode.
           const decoded = img.decode ? img.decode().catch(() => {}) : Promise.resolve()
           decoded.then(() => {
             if (destroyed) return
@@ -179,7 +143,6 @@ export function PadLayersStage() {
       pump()
     }
 
-    /** The end states first, so the stage is right before the rest arrive. */
     const requestFrames = () => {
       if (staticMode) {
         request([0])
@@ -191,12 +154,18 @@ export function PadLayersStage() {
     }
 
     const sizeCanvas = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR)
-      const width = Math.max(1, Math.round(stage.clientWidth * dpr))
-      const height = Math.max(1, Math.round(stage.clientHeight * dpr))
+      const cssWidth = Math.max(1, stage.clientWidth)
+      const cssHeight = Math.max(1, stage.clientHeight)
+      // Render at native asset resolution (or below), never above it.
+      const nativeDprCap = FRAME_W / cssWidth
+      const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR, nativeDprCap)
+      const width = Math.max(1, Math.min(FRAME_W, Math.round(cssWidth * dpr)))
+      const height = Math.max(1, Math.min(FRAME_H, Math.round(cssHeight * dpr)))
       if (!stage.clientWidth || (width === canvas.width && height === canvas.height)) return
       canvas.width = width
       canvas.height = height
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
       drawn = -1
       schedule()
     }
@@ -211,7 +180,6 @@ export function PadLayersStage() {
       }, 150)
     }
 
-    // iOS reports stale sizes right after an orientation change.
     const onOrientation = () => {
       onResize()
       window.clearTimeout(orientTimer)
@@ -231,7 +199,6 @@ export function PadLayersStage() {
     const listen = (on: boolean) => {
       if (on === listening) return
       listening = on
-      // Capture + passive: follows scrolling in any ancestor, never blocks it.
       if (on) document.addEventListener('scroll', onScroll, { passive: true, capture: true })
       else document.removeEventListener('scroll', onScroll, { capture: true })
     }
@@ -240,8 +207,6 @@ export function PadLayersStage() {
       ([entry]) => {
         if (entry.isIntersecting) {
           requestFrames()
-          // Arriving by a jump (anchor, reload mid-page): start where the
-          // scroll already is instead of easing in from closed.
           if (!listening && !staticMode) current = target = progress()
           render()
         }
@@ -270,7 +235,6 @@ export function PadLayersStage() {
       cancelAnimationFrame(raf)
       window.clearTimeout(resizeTimer)
       window.clearTimeout(orientTimer)
-      // Release image memory: abort anything still loading, drop references.
       for (const img of inFlight) {
         img.onload = img.onerror = null
         img.src = ''
@@ -288,8 +252,6 @@ export function PadLayersStage() {
       aria-label="Femi9 pad, shown separating into its layers"
       style={{ '--frame-ratio': `${FRAME_W} / ${FRAME_H}` } as CSSProperties}
     >
-      {/* The closed pad: shown until the first frame is drawn, and to anyone
-          without JS. */}
       <img src={frameSrc(ASSEMBLED)} alt="" width={FRAME_W} height={FRAME_H} decoding="async" />
       <canvas ref={canvasRef} aria-hidden="true" />
     </div>
