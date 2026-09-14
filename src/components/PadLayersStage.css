@@ -44,31 +44,32 @@
   height: 100%;
   max-width: none;
   display: block;
-  z-index: 1;
   object-fit: contain;
   image-rendering: auto;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
 }
 
-.fl-why__stage video {
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 180ms ease;
-}
-
-.fl-why__stage[data-video-ready='true'] video {
-  visibility: visible;
+.fl-why__stage .fl-why__poster {
+  z-index: 1;
   opacity: 1;
 }
 
-.fl-why__stage[data-video-ready='true'] img {
-  visibility: hidden;
+.fl-why__stage video {
+  z-index: 2;
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 140ms ease;
 }
 
-.fl-why__stage[data-video-ready='false'] video {
+.fl-why__stage[data-video-error='true'] video {
   visibility: hidden;
   opacity: 0;
+}
+
+.fl-why__stage[data-video-error='true'] .fl-why__poster {
+  visibility: visible;
+  opacity: 1;
 }
 
 @media (min-width: 901px) {
