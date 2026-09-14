@@ -1,0 +1,550 @@
+/* ============================================================
+   PERIODS WALL — community wall of honest period-product stories
+   Namespaced under .pwall. Reuses global tokens/helpers only.
+   ============================================================ */
+
+.pwall {
+  /* local, on-brand accents (heart uses a soft rose within the lavender family) */
+  --pw-plum-tint: #EDE7F9;
+  --pw-heart: #C56AA0;
+  --pw-max: 720px;
+  --pw-feed: 680px;
+  position: relative;
+}
+
+/* ---------- hero ---------- */
+.pwall-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-block: clamp(48px, 8vw, 104px) clamp(28px, 4vw, 48px);
+}
+.pwall-title {
+  margin-top: 16px;
+  font-size: clamp(2.3rem, 6.2vw, 4.1rem);
+  line-height: 1.02;
+  color: var(--navy);
+  max-width: 16ch;
+}
+.pwall-sub {
+  margin-top: 20px;
+  max-width: 60ch;
+  font-size: clamp(1.02rem, 1.4vw, 1.18rem);
+  line-height: 1.6;
+  color: var(--ink);
+}
+.pwall-kind {
+  margin-top: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  padding: 0.7em 1.15em;
+  border-radius: var(--r-chip);
+  background: var(--pw-plum-tint);
+  border: 1px solid var(--line-soft);
+  color: var(--forest-2);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+.pwall-kind span {
+  display: inline-flex;
+}
+.pwall-kind svg {
+  width: 17px;
+  height: 17px;
+  fill: var(--yellow);
+  stroke: var(--forest-2);
+  stroke-width: 1.25;
+}
+
+/* ---------- content column ---------- */
+.pwall-body-wrap {
+  padding-bottom: clamp(72px, 10vw, 130px);
+}
+
+/* ---------- compose card ---------- */
+.pw-compose {
+  max-width: var(--pw-max);
+  margin-inline: auto;
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-sm);
+  padding: clamp(22px, 3.4vw, 38px);
+}
+.pw-compose-title {
+  font-size: clamp(1.28rem, 2.2vw, 1.6rem);
+  font-weight: 600;
+  color: var(--navy);
+  letter-spacing: -0.01em;
+}
+.pw-compose-sub {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.pw-input,
+.pw-textarea {
+  width: 100%;
+  margin-top: 20px;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 0.9em 1.05em;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s var(--ease);
+}
+.pw-input::placeholder,
+.pw-textarea::placeholder {
+  color: var(--muted);
+}
+.pw-textarea {
+  min-height: 128px;
+  line-height: 1.6;
+  resize: vertical;
+}
+.pw-input:focus,
+.pw-textarea:focus {
+  outline: none;
+  background: var(--surface);
+  border-color: var(--forest-2);
+  box-shadow: 0 0 0 3px rgba(86, 49, 132, 0.14);
+}
+
+.pw-field {
+  margin-top: 22px;
+}
+.pw-label {
+  display: block;
+  margin-bottom: 11px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--navy);
+}
+
+/* product select chips */
+.pw-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.pw-chip {
+  min-height: 40px;
+  padding: 8px 15px;
+  border-radius: var(--r-chip);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  transition: background 0.2s var(--ease), color 0.2s var(--ease),
+    border-color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+/* :hover lives in the hover-capability block near the end of this file. */
+.pw-chip.is-active {
+  background: var(--forest-2);
+  color: #fff9ea;
+  border-color: var(--forest-2);
+}
+
+/* interactive stars */
+.pw-stars {
+  display: flex;
+  gap: 2px;
+}
+.pw-star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  transition: transform 0.16s var(--ease), background 0.16s var(--ease);
+}
+.pw-star:focus-visible {
+  outline: 2px solid var(--forest-2);
+  outline-offset: 2px;
+}
+.pw-star-svg {
+  width: 27px;
+  height: 27px;
+  fill: #E1D9F0;
+  transition: fill 0.16s var(--ease);
+}
+.pw-star-svg.is-on {
+  fill: var(--yellow);
+}
+
+.pw-compose-foot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 26px;
+}
+.pw-confirm {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--forest-2);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+}
+.pw-confirm.is-shown {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- filter row ---------- */
+.pw-filters {
+  max-width: var(--pw-max);
+  margin: clamp(30px, 4vw, 44px) auto clamp(20px, 3vw, 28px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  justify-content: center;
+}
+.pw-filter {
+  min-height: 40px;
+  padding: 8px 16px;
+  border-radius: var(--r-chip);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  transition: background 0.2s var(--ease), color 0.2s var(--ease),
+    border-color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.pw-filter.is-active {
+  background: var(--forest-2);
+  color: #fff9ea;
+  border-color: var(--forest-2);
+}
+
+/* ---------- feed ---------- */
+.pw-feed {
+  max-width: var(--pw-feed);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.4vw, 22px);
+}
+
+.pw-card {
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-sm);
+  padding: clamp(20px, 3vw, 28px);
+  transition: transform 0.28s var(--ease), box-shadow 0.28s var(--ease);
+}
+
+.pw-card-head {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+.pw-avatar {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  /* default tone */
+  background: var(--lilac-tint);
+  color: var(--forest-2);
+}
+.pw-card[data-tone='0'] .pw-avatar { background: var(--lilac-tint); color: var(--forest-2); }
+.pw-card[data-tone='1'] .pw-avatar { background: var(--sage-tint);  color: var(--forest); }
+.pw-card[data-tone='2'] .pw-avatar { background: var(--butter-soft); color: var(--yellow-deep); }
+.pw-card[data-tone='3'] .pw-avatar { background: var(--cream-2);     color: var(--forest-2); }
+.pw-anon-svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.pw-who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.pw-name {
+  font-weight: 600;
+  color: var(--navy);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+.pw-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 2px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.pw-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.65;
+}
+
+.pw-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 15px;
+}
+.pw-product {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: var(--r-chip);
+  background: var(--pw-plum-tint);
+  color: var(--forest-2);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  /* post.product is the resolved catalog name (lib/services/wall.ts), not one
+     of the five short compose chips — a 45-char product name gave this chip a
+     ~307px min-content inside a 284px card at 360px, and `nowrap` meant it
+     could not shrink, so it spilled past the card border into html's
+     `overflow-x: clip`. At >=1200px the card is 680px and nothing wraps, so
+     this renders identically on desktop. */
+  white-space: normal;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  min-width: 0;
+  line-height: 1.35;
+}
+.pw-stars-view {
+  display: inline-flex;
+  gap: 1px;
+}
+.pw-stars-view .pw-star-svg {
+  width: 17px;
+  height: 17px;
+}
+
+.pw-body {
+  margin-top: 14px;
+  color: var(--ink);
+  font-size: clamp(0.98rem, 1.1vw, 1.05rem);
+  line-height: 1.62;
+}
+
+.pw-card-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 15px;
+  border-top: 1px solid var(--line-soft);
+}
+.pw-heart {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 6px 14px;
+  border-radius: var(--r-chip);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--muted);
+  transition: background 0.2s var(--ease), color 0.2s var(--ease), transform 0.16s var(--ease);
+}
+.pw-heart:active {
+  transform: scale(0.94);
+}
+.pw-heart-svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  transition: fill 0.2s var(--ease), stroke 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.pw-heart-svg.is-on {
+  fill: var(--pw-heart);
+  stroke: var(--pw-heart);
+}
+.pw-heart.is-liked {
+  color: var(--pw-heart);
+}
+.pw-heart.is-liked .pw-heart-svg {
+  transform: scale(1.12);
+}
+
+/* .pw-replies / .pw-reply-svg were deleted here: replies are not wired
+   (see the Post type comment in PeriodsWall.tsx) and neither class appears in
+   the markup — the card footer holds only .pw-heart. Re-add them with the
+   feature, not before it. */
+
+/* ---------- empty state ---------- */
+.pw-empty {
+  max-width: var(--pw-feed);
+  margin-inline: auto;
+  text-align: center;
+  background: var(--lilac-tint);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-card);
+  padding: clamp(34px, 6vw, 56px) clamp(22px, 4vw, 40px);
+}
+.pw-empty-title {
+  font-weight: 600;
+  color: var(--navy);
+  font-size: 1.1rem;
+}
+.pw-empty-sub {
+  margin-top: 8px;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+/* ---------- a11y helper ---------- */
+.pw-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- hover, for real pointers only ----------
+   These five decorative states used to be unguarded. On iOS Safari and Chrome
+   for Android :hover latches onto the last-tapped element, so after liking a
+   story that card stayed raised and a tapped filter chip stayed outlined as if
+   still active — the feed showed two elements that both looked selected.
+   This block must stay ABOVE the reduced-motion block below, which cancels
+   these transforms and wins only by being later in source order. */
+@media (hover: hover) and (pointer: fine) {
+  .pw-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+  }
+  .pw-chip:hover,
+  .pw-filter:hover {
+    border-color: var(--forest-2);
+    transform: translateY(-1px);
+  }
+  .pw-star:hover {
+    background: var(--butter-soft);
+    transform: translateY(-1px);
+  }
+  .pw-heart:hover {
+    background: var(--lilac-tint);
+    color: var(--forest-2);
+  }
+}
+
+/* ---------- touch ----------
+   The author already set .pw-star to 44x44, so 44 was the intended floor —
+   the chips, the filters and the like button were simply missed at 40px.
+   Keyed on pointer rather than width so touch tablets are covered too, and so
+   desktop is untouched at every width. */
+@media (pointer: coarse) {
+  .pw-chip {
+    min-height: 44px;
+    padding: 10px 15px;
+  }
+  .pw-filter {
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+  .pw-heart {
+    min-height: 44px;
+    padding: 8px 14px;
+  }
+  /* 9px between wrapped chips is tight once each row is 44px tall. */
+  .pw-chips,
+  .pw-filters {
+    gap: 10px;
+  }
+}
+
+/* ---------- narrow phones ---------- */
+@media (max-width: 480px) {
+  /* A centred filter row reads as ragged once seven chips wrap onto three
+     lines; left-aligned it scans as a list. */
+  .pw-filters {
+    justify-content: flex-start;
+  }
+  .pw-meta,
+  .pw-label {
+    font-size: 0.88rem;
+  }
+  .pw-product {
+    font-size: 0.82rem;
+  }
+  .pw-card-head {
+    gap: 11px;
+  }
+  .pw-tags {
+    gap: 9px;
+  }
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .pw-card,
+  .pw-chip,
+  .pw-filter,
+  .pw-star,
+  .pw-heart,
+  .pw-heart-svg,
+  .pw-confirm,
+  .pw-input,
+  .pw-textarea {
+    transition: none;
+  }
+  .pw-card:hover,
+  .pw-chip:hover,
+  .pw-filter:hover,
+  .pw-star:hover,
+  .pw-heart:active,
+  .pw-heart.is-liked .pw-heart-svg {
+    transform: none;
+  }
+  .pw-confirm.is-shown {
+    transform: none;
+  }
+}
+
+/* A refused like (almost always a 401) needs a visible reason. The heart used
+   to fill optimistically and silently un-fill, leaving a signed-out visitor
+   with no idea why her tap did nothing. */
+.pw-like-error {
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--butter-soft);
+  border: 1px solid var(--line-soft);
+  color: var(--navy);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.pw-like-error-link {
+  color: var(--forest-2);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

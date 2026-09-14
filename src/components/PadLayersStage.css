@@ -1,0 +1,89 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   PadLayersStage — the centre visual of the "Why Femi9" section
+
+   Only the centre changes: the six feature cards keep their own styling and
+   entrance from figma-landing(-responsive).css and craft-home.css, untouched.
+
+   The frames are transparent cut-outs, so the layers sit directly on the
+   section's purple: no panel, no pedestal. On desktop the pad is as tall as
+   the three cards beside it and no taller, so the section keeps its height.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* The product column sizes to the stage instead of cropping a fixed-height
+   image. Its existing fade-in (figma-landing.css) still applies. */
+.figma-landing .fl-why .fl-why__product {
+  height: auto;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fl-why__stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--frame-ratio, 595 / 1240);
+  margin-inline: auto;
+  /* Grows by up to 5% while the layers are apart (--why-explode, set by the
+     component) - a transform, so it never moves the cards. */
+  transform: scale(calc(1 + var(--why-explode, 0) * 0.05));
+  transform-origin: 50% 50%;
+}
+
+/* A soft shadow under the pad, deepening a little while the layers float. */
+.fl-why__stage::before {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -3%;
+  height: 7%;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(12, 6, 32, 0.45), rgba(12, 6, 32, 0));
+  opacity: calc(0.7 + var(--why-explode, 0) * 0.3);
+  pointer-events: none;
+}
+
+.figma-landing .fl-why__product .fl-why__stage img,
+.fl-why__stage canvas {
+  position: absolute;
+  inset: 0;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  display: block;
+  z-index: 1;
+}
+
+/* Once a frame is on the canvas the fallback picture is not needed. */
+.figma-landing .fl-why__product .fl-why__stage[data-ready='true'] img {
+  visibility: hidden;
+}
+
+/* Desktop: the three cards stand 3 x 246px + 2 x 32px = 803px tall, so a pad
+   803px tall is 385px wide. */
+@media (min-width: 901px) {
+  .fl-why__stage {
+    width: min(100%, 385px);
+  }
+}
+
+@media (max-width: 900px) {
+  .figma-landing .fl-why .fl-why__product {
+    height: auto;
+    margin-bottom: 12px;
+  }
+
+  .fl-why__stage {
+    width: min(100%, 330px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fl-why__stage {
+    transform: none;
+  }
+}

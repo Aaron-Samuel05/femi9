@@ -1,0 +1,140 @@
+/**
+ * Product-detail additions owned by the ProductDetail screen.
+ *
+ * Lives in its own file, imported directly by src/screens/ProductDetail.tsx
+ * (the pattern cycle-tracker.css already uses), because src/styles/app.css is
+ * shared with the admin console and is not this track's to edit. Everything
+ * here supports controls that did not exist before: the review-form entry
+ * points, the empty-reviews state, and the copy-link share button.
+ *
+ * Tokens only — no new :root, no new colours.
+ */
+
+/* The share row's third control is now a <button> (Instagram has no web share
+   intent, so it copies the link instead of opening instagram.com with nothing
+   attached). It inherits .pdp-share-link, which was written for an <a>. */
+button.pdp-share-link {
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+button.pdp-share-link:focus-visible {
+  outline: 2px solid rgba(86, 49, 132, 0.45);
+  outline-offset: 2px;
+}
+
+/* "Write a review" inside the rating summary. The modal it opens was already
+   built and its endpoint already worked — nothing ever called setReviewOpen(true). */
+.pdp-write-review {
+  margin-top: 14px;
+  align-self: flex-start;
+}
+
+/* Second entry point, below the review cards. */
+.pdp-reviews-cta {
+  margin-top: clamp(20px, 3vw, 28px);
+  display: flex;
+  justify-content: center;
+}
+
+/* Shown instead of the rating bars when a product genuinely has no reviews.
+   The bars used to render a hardcoded 88/9/3/0/0 distribution regardless. */
+.pdp-reviews-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  padding: clamp(28px, 5vw, 48px) 20px;
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-card);
+}
+
+.pdp-reviews-empty p {
+  margin: 0;
+  max-width: 38ch;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+/* The related-product action is a real button now, not a link that only
+   navigated while wearing a bag icon. */
+button.related-add-btn-pill {
+  cursor: pointer;
+  font: inherit;
+}
+
+button.related-add-btn-pill:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------------------
+   Mobile / touch
+   --------------------------------------------------------------------------- */
+
+/* Facebook, WhatsApp and copy-link sit side by side at 32x32 with a 10px gap —
+   a 42px pitch on three adjacent controls, and the copy-link one has no other
+   entry point. Coarse pointers rather than a width query so touch tablets are
+   covered too; the painted circle grows with the box, which is fine because the
+   row has room at every viewport. */
+@media (pointer: coarse) {
+  .pdp-share-link {
+    width: 44px;
+    height: 44px;
+  }
+
+  .pdp-share-link svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .pdp-share-links {
+    gap: 12px;
+  }
+}
+
+/* The review modal is a centred card with a `vh`-based cap. `vh` does not shrink
+   when the soft keyboard opens, so the submit button ended up behind it. Docking
+   the card to the bottom as a sheet and capping it in `dvh` keeps the whole form
+   reachable while typing, and the safe-area padding keeps the submit button off
+   the home indicator. */
+@media (max-width: 768px) {
+  .pdp-modal {
+    align-items: end;
+    padding: 0;
+  }
+
+  .pdp-modal-card {
+    width: 100%;
+    border-radius: 18px 18px 0 0;
+    max-height: min(88dvh, 100%);
+    /* Longhand on purpose: app.css sets padding-top on coarse pointers to keep
+       the enlarged close button off the first field, and a shorthand here would
+       silently undo it depending on which sheet loads last. */
+    padding-right: 18px;
+    padding-left: 18px;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+
+  /* The fullscreen image viewer stays centred — it has no form to keep clear. */
+  .pdp-image-modal-card {
+    max-height: min(88dvh, 100%);
+    margin: auto;
+  }
+
+  .pdp-image-modal-card img,
+  .pdp-image-modal-card svg {
+    max-height: calc(88dvh - 24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.pdp-share-link,
+  button.related-add-btn-pill {
+    transition: none;
+  }
+}

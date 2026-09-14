@@ -1,0 +1,287 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CardSwipe — cover-flow product carousel (see CardSwipe.tsx)
+
+   The product cards keep their own inline styling. This sheet only lays out the
+   stage the cards stand on and styles the controls. Card poses (x, y, rotation,
+   scale, opacity, z-index) are written by the component, frame by frame.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.f9-cf {
+  position: relative;
+  width: 100%;
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 16px 0 24px;
+  outline: none;
+}
+
+.f9-cf:focus-visible {
+  outline: 2px solid rgba(60, 42, 94, 0.45);
+  outline-offset: 6px;
+  border-radius: 24px;
+}
+
+/* Clips sideways only: cards peeking past the edge never widen the page, while
+   the tilted neighbours and the active card's shadow keep their vertical room. */
+.f9-cf__viewport {
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+/* Every card sits in the same grid cell, centred. The row is as tall as the
+   tallest card, so the stage needs no measuring, and cards stretch to match. */
+.f9-cf__stage {
+  /* Wide enough for the details and the product image side by side. */
+  --cf-card-w: clamp(540px, 46vw, 680px);
+  display: grid;
+  grid-template-areas: 'stack';
+  justify-items: center;
+  align-items: stretch;
+  padding-block: 8px 32px;
+  /* Vertical page scroll stays with the browser; horizontal swipes are ours. */
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.f9-cf__stage.is-dragging,
+.f9-cf__stage.is-dragging .f9-cf__slide {
+  cursor: grabbing;
+}
+
+.f9-cf__slide {
+  position: relative;
+  grid-area: stack;
+  width: var(--cf-card-w);
+  max-width: 100%;
+  transform-origin: 50% 70%;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Side cards recede by washing toward the white page (see POSE.veil). The slide's
+   transform makes it a stacking context, so this z-index only has to clear the
+   card's own badges (z-index 2). */
+.f9-cf__slide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  border-radius: 20px;
+  background: #fff;
+  opacity: var(--cf-veil, 0);
+  pointer-events: none;
+}
+
+.f9-cf__slide:not(.is-active) {
+  cursor: pointer;
+}
+
+.f9-cf__slide img {
+  -webkit-user-drag: none;
+}
+
+/* Hover on the showcased card (mouse only): the card lifts a few pixels and
+   the product rises a touch inside it. The slide's own transform belongs to
+   the carousel motion, so these move the card and image INSIDE the slide and
+   never touch it. Off while dragging, and off with reduced motion. */
+@media (hover: hover) and (pointer: fine) {
+  .f9-cf__slide.is-active:hover .f9-carousel-card {
+    transform: translateY(-4px);
+  }
+
+  .f9-cf__slide.is-active:hover .f9-carousel-card__media img {
+    transform: translateY(-4px);
+  }
+
+  .f9-cf__stage.is-dragging .f9-cf__slide.is-active .f9-carousel-card,
+  .f9-cf__stage.is-dragging .f9-cf__slide.is-active .f9-carousel-card__media img {
+    transform: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .f9-cf__stage {
+    --cf-card-w: min(86vw, 600px);
+  }
+}
+
+/* Phone: the showcased card owns the width; neighbours peek in at the edges. */
+@media (max-width: 640px) {
+  .f9-cf__stage {
+    --cf-card-w: min(74vw, 320px);
+  }
+}
+
+/* ── Card layout ───────────────────────────────────────────────────────────
+   The card's colours and type stay inline in CardSwipe.tsx; only its layout
+   lives here, because it changes with the width.
+
+   Phone (stacked): the product image on top, the details below it.
+   641px and up: the details on the left, the product image on the right. The
+   image column runs the full height of the card, so the product is the largest
+   thing in it; the price and Buy Now sit at the foot of the details. */
+.f9-carousel-card {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.f9-carousel-card__media {
+  flex: none;
+  height: 260px;
+  margin-bottom: 16px;
+}
+
+.f9-carousel-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.f9-carousel-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+@media (min-width: 641px) {
+  .f9-carousel-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    column-gap: clamp(18px, 2vw, 28px);
+    padding: clamp(20px, 1.8vw, 26px);
+  }
+
+  .f9-carousel-card__body {
+    grid-column: 1;
+    grid-row: 1;
+    padding-block: 4px;
+  }
+
+  .f9-carousel-card__media {
+    grid-column: 2;
+    grid-row: 1;
+    height: auto;
+    min-height: clamp(280px, 24vw, 330px);
+    margin-bottom: 0;
+  }
+}
+
+.f9-cf__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Controls ─────────────────────────────────────────────────────────────── */
+
+.f9-cf__controls {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+}
+
+.f9-cf__dots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.f9-cf__dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: rgba(60, 42, 94, 0.2);
+  cursor: pointer;
+  transition:
+    width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.f9-cf__dot.is-active {
+  width: 28px;
+  background: #3c2a5e;
+}
+
+@media (hover: hover) {
+  .f9-cf__dot:not(.is-active):hover {
+    background: rgba(60, 42, 94, 0.4);
+  }
+}
+
+.f9-cf__arrows {
+  display: flex;
+  gap: 10px;
+}
+
+.f9-cf__arrow {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(60, 42, 94, 0.18);
+  background: rgba(255, 255, 255, 0.9);
+  color: #3c2a5e;
+  font: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(60, 42, 94, 0.08);
+  transition:
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (hover: hover) {
+  .f9-cf__arrow:not(:disabled):hover {
+    transform: translateY(-1px);
+    border-color: rgba(60, 42, 94, 0.34);
+    box-shadow: 0 6px 16px rgba(60, 42, 94, 0.14);
+  }
+}
+
+.f9-cf__arrow:not(:disabled):active {
+  transform: scale(0.96);
+}
+
+.f9-cf__arrow:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.f9-cf__dot:focus-visible,
+.f9-cf__arrow:focus-visible {
+  outline: 2px solid rgba(60, 42, 94, 0.5);
+  outline-offset: 3px;
+}
+
+/* Reduced motion: the component snaps instead of springing and drops the tilt;
+   the controls change state without easing. */
+@media (prefers-reduced-motion: reduce) {
+  .f9-cf__dot,
+  .f9-cf__arrow {
+    transition: none;
+  }
+
+  .f9-cf__slide {
+    will-change: auto;
+  }
+}
