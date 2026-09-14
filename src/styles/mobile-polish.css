@@ -3,17 +3,30 @@
    phone/tablet breakpoint; desktop remains unchanged. */
 
 @media (max-width: 960px) {
-  /* ── Header: never squeeze desktop links into a phone ─────────────── */
+  /* ── Header: fixed compact mobile bar ─────────────────────────────── */
   .nav {
+    position: fixed !important;
     top: max(10px, env(safe-area-inset-top)) !important;
+    left: 50% !important;
     width: calc(100% - 20px) !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
     border-radius: 20px !important;
+    overflow: visible !important;
   }
 
   .nav-in {
+    width: 100% !important;
     height: 64px !important;
     min-height: 64px !important;
+    max-height: 64px !important;
     padding: 7px 12px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
     gap: 8px !important;
     flex-wrap: nowrap !important;
   }
@@ -25,7 +38,7 @@
     padding: 0 !important;
   }
 
-  /* craft-nav.css made .nav-links !important, which accidentally resurrected
+  /* craft-nav.css made .nav-links important, which accidentally resurrected
      the five desktop links after Nav.css hid them below 960px. */
   .nav-links {
     display: none !important;
@@ -42,6 +55,7 @@
     width: 38px !important;
     height: 38px !important;
     min-width: 38px !important;
+    min-height: 38px !important;
   }
 
   .nav-right .cart-btn svg,
@@ -58,9 +72,9 @@
     box-sizing: border-box !important;
   }
 
-  /* ── Hero: shorter first scene and a more useful product reveal ───── */
+  /* ── Hero: start safely below the compact floating navbar ─────────── */
   .figma-landing .fl-hero--fullscreen-studio {
-    padding-top: 92px !important;
+    padding-top: 112px !important;
   }
 
   .fl-hero--fullscreen-studio .fl-hero__inner {
@@ -116,7 +130,7 @@
 
 @media (max-width: 620px) {
   .figma-landing .fl-hero--fullscreen-studio {
-    padding-top: 88px !important;
+    padding-top: 112px !important;
   }
 
   .fl-hero--fullscreen-studio .fl-hero__fullscreen-bg {
