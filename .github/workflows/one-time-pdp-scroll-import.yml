@@ -1,0 +1,39 @@
+name: Apply PDP scroll polish
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add PDP scroll polish import
+        shell: bash
+        run: |
+          set -euo pipefail
+          file='src/screens/ProductDetail.tsx'
+          import_line="import '../styles/pdp-scroll-polish.css'"
+          if ! grep -Fqx "$import_line" "$file"; then
+            python - <<'PY'
+from pathlib import Path
+p = Path('src/screens/ProductDetail.tsx')
+s = p.read_text()
+needle = "import '../styles/product-detail-extras.css'\n"
+insert = needle + "import '../styles/pdp-scroll-polish.css'\n"
+if "import '../styles/pdp-scroll-polish.css'" not in s:
+    if needle not in s:
+        raise SystemExit('expected ProductDetail import anchor not found')
+    s = s.replace(needle, insert, 1)
+    p.write_text(s)
+PY
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add src/screens/ProductDetail.tsx
+            git commit -m 'fix: load PDP scroll polish styles' || true
+            git push
+          fi
