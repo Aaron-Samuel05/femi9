@@ -11,7 +11,8 @@
   width: min(1340px, calc(100% - 40px)) !important;
   max-width: calc(100% - 40px) !important;
   margin: 0 !important;
-  border-radius: 28px !important;
+  /* True pill/capsule shape — the side corners remain fully rounded on desktop. */
+  border-radius: 9999px !important;
   overflow: visible !important;
   background: rgba(60, 42, 94, 0.72) !important;
   backdrop-filter: blur(22px) saturate(170%) !important;
@@ -107,9 +108,7 @@
 }
 
 .nav-links a:hover::after,
-.nav-links a:focus-visible::after {
-  width: 18px;
-}
+.nav-links a:focus-visible::after { width: 18px; }
 
 .nav-links a:focus-visible {
   outline: 2px solid rgba(255,255,255,.55) !important;
@@ -177,15 +176,13 @@
   padding: 14px !important;
 }
 
-/* The floating treatment is intentional at every desktop width — it must not
-   collapse into the old full-width/header treatment on larger screens. */
+/* The floating treatment is intentional at every desktop width. */
 @media (min-width: 861px) {
   .nav {
     width: min(1340px, calc(100% - 40px)) !important;
     max-width: calc(100% - 40px) !important;
-    border-radius: 28px !important;
+    border-radius: 9999px !important;
   }
-
   .nav-in { min-height: 68px !important; }
   .mobile-menu { display: none !important; }
 }
@@ -195,7 +192,7 @@
     top: 12px !important;
     width: calc(100% - 24px) !important;
     max-width: calc(100% - 24px) !important;
-    border-radius: 20px !important;
+    border-radius: 9999px !important;
   }
   .nav-in { min-height: 58px !important; padding: 7px 14px !important; gap: 10px !important; }
   .nav-logo { width: 96px !important; height: 44px !important; }
