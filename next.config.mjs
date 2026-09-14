@@ -53,9 +53,12 @@ const nextConfig = {
   // would point outside it and prune files the server needs.
   ...(onVercel ? {} : { outputFileTracingRoot: path.join(import.meta.dirname, '..', '..') }),
   // The three.js / R3F stack ships ESM that Next needs to transpile.
-  // @femi9/db is a workspace package published as TypeScript source, so it
-  // needs transpiling too — there is no build step in front of it.
-  transpilePackages: ['three', '@react-three/fiber', '@react-three/drei', '@femi9/db', '@femi9/core'],
+  // @femi9/db and @femi9/core used to be listed here as workspace packages
+  // published as TypeScript source. In this standalone copy they are not
+  // packages at all — they resolve through `paths` in tsconfig.json to local
+  // files under `stubs/`, which the compiler already handles — and naming a
+  // package that is not installed here would be misleading.
+  transpilePackages: ['three', '@react-three/fiber', '@react-three/drei'],
 
   // The ops console moved to its own app. Old bookmarks and any stray /admin
   // link should land there rather than 404. Only wired when the console's URL
