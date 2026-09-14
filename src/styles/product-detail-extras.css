@@ -33,153 +33,180 @@ button.related-add-btn-pill:disabled { opacity:.5; cursor:not-allowed; }
 
 .pdp-page .pdp-main-content { background:#fff; }
 .pdp-page .pdp-main-content > .wrap { max-width:1280px; padding-inline:clamp(20px,4vw,48px); }
-.pdp-page .crumbs { margin-bottom:20px; }
+.pdp-page .crumbs { margin-bottom:18px; }
 
-/* Two-column Apple-style composition: generous gallery, compact configurator. */
-.pdp-page .pdp-grid {
-  grid-template-columns:minmax(0,1.08fr) minmax(420px,.92fr) !important;
-  gap:clamp(36px,5vw,76px) !important;
-  align-items:start !important;
+/* Desktop Apple-style buying composition. */
+@media (min-width:921px) {
+  .pdp-page .pdp-grid {
+    grid-template-columns:minmax(0,1.18fr) minmax(420px,.82fr) !important;
+    gap:clamp(44px,5vw,84px) !important;
+    align-items:start !important;
+  }
+
+  .pdp-page .pdp-gallery-layout { min-width:0; }
+  .pdp-page .pdp-stage-column {
+    position:sticky !important;
+    top:calc(var(--nav-h) + 18px) !important;
+    gap:18px !important;
+    align-self:start !important;
+  }
+
+  /* Product becomes the hero, not a small framed image. */
+  .pdp-page .pdp-hero-stage {
+    width:100%;
+    height:clamp(560px,68vh,720px) !important;
+    aspect-ratio:auto !important;
+    min-height:560px !important;
+    background:#f5f5f7 !important;
+    border:0 !important;
+    border-radius:32px !important;
+    box-shadow:none !important;
+    padding:clamp(30px,4vw,64px) !important;
+    display:grid;
+    place-items:center;
+    overflow:hidden !important;
+  }
+  .pdp-page .pdp-hero-stage img,
+  .pdp-page .pdp-hero-stage svg {
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    object-fit:contain !important;
+    object-position:center !important;
+    border-radius:0 !important;
+    filter:drop-shadow(0 28px 36px rgba(45,30,70,.10));
+  }
+
+  .pdp-page .pdp-thumb-rail { gap:12px; padding:4px 0 0; justify-content:center; }
+  .pdp-page .pdp-thumb { width:68px; height:68px; border:1.5px solid #e1e1e6; border-radius:14px; background:#f5f5f7; box-shadow:none; }
+  .pdp-page .pdp-thumb.active { border-color:#3c2a5e; box-shadow:0 0 0 1px #3c2a5e; }
+
+  /* Configurator stays available while the gallery holds position. */
+  .pdp-page .pdp-right-col {
+    max-width:620px !important;
+    min-width:0;
+    padding-bottom:64px;
+    gap:20px !important;
+    position:sticky;
+    top:calc(var(--nav-h) + 18px);
+    align-self:start;
+  }
+
+  .pdp-page .pdp-right-col > * { scroll-margin-top:calc(var(--nav-h) + 24px); }
+  .pdp-page .pdp-eyebrow { font-size:11px; letter-spacing:.14em; font-weight:700; color:#7f7f86; }
+  .pdp-page .pdp-title { margin:0 !important; font-size:clamp(38px,3.2vw,56px) !important; line-height:.98 !important; letter-spacing:-.035em; color:#211437 !important; max-width:12ch; }
+  .pdp-page .pdp-rating-row { display:flex; flex-wrap:wrap; align-items:center; gap:7px; font-size:13px; }
+  .pdp-page .pdp-desc-text { max-width:53ch; margin:0 !important; font-size:15px !important; line-height:1.52 !important; color:#66606e !important; }
+  .pdp-page .pdp-price-block { margin-top:0; }
+  .pdp-page .pdp-price-line { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+  .pdp-page .pdp-now-price { font-size:32px !important; font-weight:700; }
+  .pdp-page .pdp-tax-note { display:block; margin-top:4px; color:#7f7f86; font-size:11px; }
+
+  /* Conversational labels without changing the underlying selection logic. */
+  .pdp-page .pdp-label {
+    margin-bottom:10px;
+    font-size:18px;
+    font-weight:700;
+    letter-spacing:-.015em;
+    color:#211437;
+    line-height:1.25;
+  }
+  .pdp-page .pdp-block:nth-of-type(6) .pdp-label { font-size:0; }
+  .pdp-page .pdp-block:nth-of-type(6) .pdp-label::before { content:'Size. Which length fits your needs?'; font-size:18px; }
+  .pdp-page .pdp-block:nth-of-type(7) .pdp-label { font-size:0; }
+  .pdp-page .pdp-block:nth-of-type(7) .pdp-label::before { content:'Pack. How many items do you need?'; font-size:18px; }
+  .pdp-page .pdp-block:nth-of-type(8) .pdp-label { font-size:0; }
+  .pdp-page .pdp-block:nth-of-type(8) .pdp-label::before { content:'Purchase options. Choose how you would like to buy.'; font-size:18px; }
+
+  /* Full-width option cards, closer to Apple's selection language. */
+  .pdp-page .pdp-size-run,
+  .pdp-page .size-cards,
+  .pdp-page .pack-cards { display:grid !important; grid-template-columns:1fr !important; gap:10px !important; }
+  .pdp-page .pdp-size-chip,
+  .pdp-page .size-card,
+  .pdp-page .pack-card {
+    width:100% !important;
+    min-height:74px;
+    padding:16px 18px !important;
+    border:1.5px solid #d1d1d6 !important;
+    border-radius:18px !important;
+    background:#fff !important;
+    color:#211437 !important;
+    box-shadow:none !important;
+    transform:none !important;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    text-align:left;
+    font-size:16px;
+    font-weight:600;
+    transition:border-color .2s ease, background .2s ease, box-shadow .2s ease;
+  }
+  .pdp-page .pdp-size-chip b,
+  .pdp-page .pack-card b { font-size:18px; }
+  .pdp-page .pdp-size-chip span,
+  .pdp-page .pack-card span { font-size:13px; color:#777; opacity:1; white-space:normal; text-align:right; }
+  .pdp-page .pdp-size-chip.active,
+  .pdp-page .size-card.active,
+  .pdp-page .pack-card.active {
+    border-color:#3c2a5e !important;
+    background:#faf8ff !important;
+    color:#211437 !important;
+    box-shadow:0 0 0 1px #3c2a5e !important;
+  }
+  .pdp-page .pdp-size-chip:hover,
+  .pdp-page .size-card:hover,
+  .pdp-page .pack-card:hover { border-color:#8f7aa9 !important; box-shadow:0 4px 14px rgba(45,30,70,.07) !important; }
+
+  .pdp-page .sub-options { display:grid; gap:10px; }
+  .pdp-page .sub-row {
+    width:100%; min-height:76px; padding:16px 18px !important;
+    border:1.5px solid #d1d1d6 !important; border-radius:18px !important;
+    background:#fff !important; box-shadow:none !important;
+    display:flex; align-items:center; gap:14px; text-align:left;
+    transition:border-color .2s ease, background .2s ease, box-shadow .2s ease;
+  }
+  .pdp-page .sub-row.active { border-color:#3c2a5e !important; background:#faf8ff !important; box-shadow:0 0 0 1px #3c2a5e !important; }
+  .pdp-page .sub-row-content { flex:1; min-width:0; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  .pdp-page .sub-row-content b { font-size:16px; color:#211437; }
+  .pdp-page .sub-row-content span { font-size:13px; color:#777; text-align:right; }
+  .pdp-page .sub-radio-dot { flex:none; width:20px; height:20px; border:1.5px solid #777; border-radius:50%; background:#fff; }
+  .pdp-page .sub-row.active .sub-radio-dot { border:6px solid #3c2a5e; }
+
+  .pdp-page .cta-row { display:grid; grid-template-columns:112px minmax(0,1fr); gap:12px; align-items:stretch; }
+  .pdp-page .qty-stepper { min-height:58px; border:1.5px solid #d1d1d6; border-radius:16px; display:grid; grid-template-columns:1fr 1fr 1fr; align-items:center; overflow:hidden; background:#fff; }
+  .pdp-page .qty-stepper button { border:0; background:transparent; font-size:18px; cursor:pointer; color:#3c2a5e; }
+  .pdp-page .qty-stepper span { text-align:center; font-weight:700; }
+  .pdp-page .add-to-bag-btn { min-height:58px; border:0; border-radius:18px !important; background:#f5bf3b !important; color:#211437 !important; font-size:16px; font-weight:700; box-shadow:0 8px 20px rgba(60,42,94,.12); }
+  .pdp-page .add-to-bag-btn:hover { transform:translateY(-1px); box-shadow:0 12px 26px rgba(60,42,94,.16); }
+
+  .pdp-page .pdp-benefit-badges { background:#f5f5f7; border:1px solid #e5e5ea; border-radius:20px; box-shadow:none; }
+  .pdp-page .benefit-circle { box-shadow:none; }
+
+  /* Desktop uses a compact PDP summary instead of the large editorial badge. */
+  .pdp-page .pdp-right-col::before {
+    content:'Femi9 Product';
+    display:block;
+    position:relative;
+    width:max-content;
+    margin-bottom:-2px;
+    padding:7px 11px;
+    border:1px solid rgba(60,42,94,.10);
+    border-radius:999px;
+    background:#f7f5fa;
+    color:#211437;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.02em;
+  }
 }
 
-.pdp-page .pdp-gallery-layout { min-width:0; }
-.pdp-page .pdp-stage-column { top:calc(var(--nav-h) + 20px); gap:16px; }
-.pdp-page .pdp-hero-stage {
-  width:100%;
-  aspect-ratio:1/1 !important;
-  min-height:0 !important;
-  background:#f5f5f7 !important;
-  border:0 !important;
-  border-radius:28px !important;
-  box-shadow:none !important;
-  padding:clamp(28px,5vw,64px) !important;
-  display:grid;
-  place-items:center;
-  overflow:hidden !important;
-}
-.pdp-page .pdp-hero-stage img,
-.pdp-page .pdp-hero-stage svg { max-width:92%; max-height:92%; object-fit:contain; border-radius:0; filter:drop-shadow(0 24px 30px rgba(45,30,70,.10)); }
-.pdp-page .pdp-thumb-rail { gap:10px; padding:2px 0 4px; }
-.pdp-page .pdp-thumb { width:72px; height:72px; border:2px solid transparent; border-radius:14px; background:#f5f5f7; box-shadow:none; }
-.pdp-page .pdp-thumb.active { border-color:#3c2a5e; box-shadow:0 0 0 1px #3c2a5e; }
-
-/* Right side reads as a clean configuration panel. */
-.pdp-page .pdp-right-col {
-  max-width:620px !important;
-  gap:22px !important;
-  min-width:0;
-  padding-bottom:48px;
-}
-.pdp-page .pdp-eyebrow { font-size:12px; letter-spacing:.12em; font-weight:700; color:#777; }
-.pdp-page .pdp-title { margin:0 !important; font-size:clamp(34px,3.4vw,52px) !important; line-height:1.02 !important; letter-spacing:-.025em; color:#211437 !important; }
-.pdp-page .pdp-rating-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:14px; }
-.pdp-page .pdp-desc-text { max-width:58ch; margin:0 !important; font-size:17px !important; line-height:1.6 !important; color:#5f566b !important; }
-.pdp-page .pdp-price-block { margin-top:2px; }
-.pdp-page .pdp-price-line { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
-.pdp-page .pdp-now-price { font-size:34px !important; font-weight:700; }
-.pdp-page .pdp-tax-note { display:block; margin-top:4px; color:#777; font-size:12px; }
-
-/* Conversational section headings. */
-.pdp-page .pdp-label { margin-bottom:10px; font-size:17px; font-weight:700; letter-spacing:-.01em; color:#211437; }
-.pdp-page .pdp-label-note { font-weight:500; color:#777; }
-.pdp-page .pdp-block { margin:0 !important; }
-
-/* Full-width Apple-style option cards. */
-.pdp-page .pdp-size-run,
-.pdp-page .size-cards,
-.pdp-page .pack-cards { display:grid !important; grid-template-columns:1fr !important; gap:10px !important; }
-.pdp-page .pdp-size-chip,
-.pdp-page .size-card,
-.pdp-page .pack-card {
-  width:100% !important;
-  min-height:72px;
-  padding:16px 18px !important;
-  border:2px solid #d2d2d7 !important;
-  border-radius:18px !important;
-  background:#fff !important;
-  color:#211437 !important;
-  box-shadow:none !important;
-  transform:none !important;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  text-align:left;
-  font-size:16px;
-  font-weight:600;
-  transition:border-color .2s ease, background .2s ease, box-shadow .2s ease;
-}
-.pdp-page .pdp-size-chip b,
-.pdp-page .pack-card b { font-size:17px; }
-.pdp-page .pdp-size-chip span,
-.pdp-page .pack-card span { font-size:13px; color:#777; opacity:1; white-space:normal; text-align:right; }
-.pdp-page .pdp-size-chip.active,
-.pdp-page .size-card.active,
-.pdp-page .pack-card.active {
-  border-color:#3c2a5e !important;
-  background:#faf8ff !important;
-  color:#211437 !important;
-  box-shadow:0 0 0 1px #3c2a5e !important;
-}
-.pdp-page .pdp-size-chip:hover,
-.pdp-page .size-card:hover,
-.pdp-page .pack-card:hover { border-color:#8f7aa9 !important; box-shadow:0 4px 14px rgba(45,30,70,.07) !important; }
-
-/* Purchase choices use the same card language, with a strong selected state. */
-.pdp-page .sub-options { display:grid; gap:10px; }
-.pdp-page .sub-row {
-  width:100%; min-height:76px; padding:16px 18px !important;
-  border:2px solid #d2d2d7 !important; border-radius:18px !important;
-  background:#fff !important; box-shadow:none !important;
-  display:flex; align-items:center; gap:14px; text-align:left;
-  transition:border-color .2s ease, background .2s ease, box-shadow .2s ease;
-}
-.pdp-page .sub-row.active { border-color:#3c2a5e !important; background:#faf8ff !important; box-shadow:0 0 0 1px #3c2a5e !important; }
-.pdp-page .sub-row-content { flex:1; min-width:0; display:flex; align-items:center; justify-content:space-between; gap:16px; }
-.pdp-page .sub-row-content b { font-size:16px; color:#211437; }
-.pdp-page .sub-row-content span { font-size:13px; color:#777; text-align:right; }
-.pdp-page .sub-radio-dot { flex:none; width:20px; height:20px; border:1.5px solid #777; border-radius:50%; background:#fff; }
-.pdp-page .sub-row.active .sub-radio-dot { border:6px solid #3c2a5e; }
-
-/* CTA row: quantity stays compact; Add to bag gets the visual priority. */
-.pdp-page .cta-row { display:grid; grid-template-columns:116px minmax(0,1fr); gap:12px; align-items:stretch; }
-.pdp-page .qty-stepper { min-height:58px; border:1.5px solid #d2d2d7; border-radius:16px; display:grid; grid-template-columns:1fr 1fr 1fr; align-items:center; overflow:hidden; background:#fff; }
-.pdp-page .qty-stepper button { border:0; background:transparent; font-size:18px; cursor:pointer; color:#3c2a5e; }
-.pdp-page .qty-stepper span { text-align:center; font-weight:700; }
-.pdp-page .add-to-bag-btn { min-height:58px; border:0; border-radius:16px !important; background:#f5bf3b !important; color:#211437 !important; font-size:16px; font-weight:700; box-shadow:0 8px 20px rgba(60,42,94,.12); }
-.pdp-page .add-to-bag-btn:hover { transform:translateY(-1px); box-shadow:0 12px 26px rgba(60,42,94,.16); }
-
-/* Trust panel is deliberately quiet so it doesn't compete with the purchase. */
-.pdp-page .pdp-benefit-badges { background:#f5f5f7; border:1px solid #e5e5ea; border-radius:20px; box-shadow:none; }
-.pdp-page .benefit-circle { box-shadow:none; }
-
-/* Apple-like persistent product summary on the right. The existing product title
-   remains in normal flow; the compact title/price strip is built from the same
-   visible fields where possible without changing product logic. */
-.pdp-page .pdp-right-col::before {
-  content:'Product';
-  display:block;
-  position:sticky;
-  top:calc(var(--nav-h) + 8px);
-  z-index:4;
-  width:max-content;
-  margin-bottom:-2px;
-  padding:9px 14px;
-  border:1px solid rgba(60,42,94,.10);
-  border-radius:999px;
-  background:rgba(255,255,255,.88);
-  backdrop-filter:blur(18px) saturate(1.15);
-  -webkit-backdrop-filter:blur(18px) saturate(1.15);
-  color:#211437;
-  font-size:13px;
-  font-weight:700;
-  box-shadow:0 8px 22px rgba(45,30,70,.08);
-}
-
-/* Tablet/mobile: stack exactly once; remove sticky gallery and keep controls usable. */
+/* Tablet/mobile: preserve a simple one-column PDP and the touch-friendly controls. */
 @media (max-width:920px) {
   .pdp-page .pdp-grid { grid-template-columns:1fr !important; gap:28px !important; }
   .pdp-page .pdp-stage-column { position:static !important; }
-  .pdp-page .pdp-right-col { max-width:none !important; }
+  .pdp-page .pdp-right-col { max-width:none !important; position:static !important; padding-bottom:48px; }
   .pdp-page .pdp-right-col::before { display:none; }
 }
 
@@ -187,9 +214,13 @@ button.related-add-btn-pill:disabled { opacity:.5; cursor:not-allowed; }
   .pdp-page .pdp-main-content > .wrap { padding-inline:16px; }
   .pdp-page .crumbs { margin-bottom:14px; }
   .pdp-page .pdp-grid { gap:24px !important; }
-  .pdp-page .pdp-hero-stage { border-radius:24px !important; padding:22px !important; }
-  .pdp-page .pdp-title { font-size:36px !important; }
+  .pdp-page .pdp-hero-stage { height:min(92vw,520px) !important; min-height:0 !important; border-radius:24px !important; padding:18px !important; }
+  .pdp-page .pdp-hero-stage img,.pdp-page .pdp-hero-stage svg { width:100% !important; height:100% !important; max-width:100% !important; max-height:100% !important; object-fit:contain !important; }
+  .pdp-page .pdp-thumb-rail { justify-content:center; gap:9px; }
+  .pdp-page .pdp-thumb { width:60px; height:60px; border-radius:13px; }
+  .pdp-page .pdp-title { font-size:36px !important; max-width:15ch; }
   .pdp-page .pdp-desc-text { font-size:16px !important; }
+  .pdp-page .pdp-label { font-size:17px; }
   .pdp-page .pdp-size-chip,.pdp-page .size-card,.pdp-page .pack-card,.pdp-page .sub-row { min-height:68px; border-radius:16px !important; }
   .pdp-page .sub-row-content { align-items:flex-start; flex-direction:column; gap:4px; }
   .pdp-page .sub-row-content span { text-align:left; }
