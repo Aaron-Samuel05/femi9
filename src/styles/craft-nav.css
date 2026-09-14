@@ -1,207 +1,22 @@
-/* ═══════════════════════════════════════════════════════════════════════════
-   FEMI9 PREMIUM FLOATING NAV — DESKTOP + MOBILE
-   Presentation-only overrides. Navigation behaviour remains in Nav.tsx.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.nav {
-  position: fixed !important;
-  top: 18px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: min(1340px, calc(100% - 40px)) !important;
-  max-width: calc(100% - 40px) !important;
-  margin: 0 !important;
-  /* True pill/capsule shape — the side corners remain fully rounded on desktop. */
-  border-radius: 9999px !important;
-  overflow: visible !important;
-  background: rgba(60, 42, 94, 0.72) !important;
-  backdrop-filter: blur(22px) saturate(170%) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(170%) !important;
-  border: 1px solid rgba(255,255,255,.20) !important;
-  box-shadow: 0 12px 34px rgba(25,14,48,.20), inset 0 1px 0 rgba(255,255,255,.20) !important;
-  z-index: 1000 !important;
-  animation: navFloatEntrance .5s cubic-bezier(.16,1,.3,1) forwards !important;
-  transition: background .3s ease, border-color .3s ease, box-shadow .3s ease, top .3s ease !important;
-}
-
-@keyframes navFloatEntrance {
-  from { opacity: 0; transform: translate(-50%, -12px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
-}
-
-.nav.scrolled {
-  top: 12px !important;
-  background: rgba(42, 29, 72, .86) !important;
-  backdrop-filter: blur(24px) saturate(185%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(185%) !important;
-  border-color: rgba(255,255,255,.24) !important;
-  box-shadow: 0 15px 42px rgba(18,9,39,.28), inset 0 1px 0 rgba(255,255,255,.22) !important;
-}
-
-.nav-in {
-  min-height: 68px !important;
-  padding: 9px 22px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 28px !important;
-}
-
-.nav-logo {
-  flex: 0 0 auto !important;
-  display: flex !important;
-  align-items: center !important;
-  padding: 0 !important;
-  width: 116px !important;
-  height: 48px !important;
-  overflow: hidden !important;
-}
-
-.nav-links {
-  flex: 1 1 auto !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: clamp(4px, 1vw, 14px) !important;
-}
-
-/* Refined hover: no glow, no jumping pill. A quiet translucent surface plus
-   an animated underline gives the navigation a more deliberate Apple-like feel. */
-.nav-links a {
-  position: relative !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-height: 40px !important;
-  padding: 7px 13px !important;
-  border-radius: 12px !important;
-  color: rgba(255,255,255,.78) !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  letter-spacing: .005em !important;
-  opacity: 1 !important;
-  background: transparent !important;
-  text-shadow: none !important;
-  transform: none !important;
-  transition: color .22s ease, background-color .22s ease !important;
-}
-
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: 4px;
-  width: 0;
-  height: 2px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.92);
-  transform: translateX(-50%);
-  transition: width .22s cubic-bezier(.2,.7,.2,1) !important;
-}
-
-.nav-links a:hover,
-.nav-links a:focus-visible {
-  color: #fff !important;
-  background: rgba(255,255,255,.09) !important;
-  text-shadow: none !important;
-  transform: none !important;
-}
-
-.nav-links a:hover::after,
-.nav-links a:focus-visible::after { width: 18px; }
-
-.nav-links a:focus-visible {
-  outline: 2px solid rgba(255,255,255,.55) !important;
-  outline-offset: 2px;
-}
-
-.nav-right {
-  flex: 0 0 auto !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 9px !important;
-}
-
-.cart-btn,
-.burger {
-  position: relative !important;
-  width: 42px !important;
-  height: 42px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex: 0 0 42px !important;
-  border-radius: 50% !important;
-  background: rgba(255,255,255,.10) !important;
-  border: 1px solid rgba(255,255,255,.18) !important;
-  color: #fff !important;
-  box-shadow: none !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-  transition: background .22s ease, border-color .22s ease, transform .22s cubic-bezier(.2,.7,.2,1), box-shadow .22s ease !important;
-}
-
-.cart-btn:hover,
-.burger:hover {
-  background: rgba(255,255,255,.18) !important;
-  border-color: rgba(255,255,255,.34) !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 7px 18px rgba(15,7,32,.16) !important;
-}
-
-.cart-btn:active,
-.burger:active { transform: scale(.97) !important; }
-
-.cart-btn:focus-visible,
-.burger:focus-visible {
-  outline: 2px solid rgba(255,255,255,.6) !important;
-  outline-offset: 3px;
-}
-
-.cart-count {
-  background: #f2a93b !important;
-  color: #2a1d45 !important;
-  font-weight: 700 !important;
-  box-shadow: 0 2px 8px rgba(242,169,59,.4) !important;
-}
-
-.mobile-menu {
-  top: calc(100% + 10px) !important;
-  border-radius: 22px !important;
-  background: rgba(45,32,85,.94) !important;
-  backdrop-filter: blur(24px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
-  border: 1px solid rgba(255,255,255,.20) !important;
-  box-shadow: 0 18px 44px rgba(20,10,45,.30) !important;
-  padding: 14px !important;
-}
-
-/* The floating treatment is intentional at every desktop width. */
-@media (min-width: 861px) {
-  .nav {
-    width: min(1340px, calc(100% - 40px)) !important;
-    max-width: calc(100% - 40px) !important;
-    border-radius: 9999px !important;
-  }
-  .nav-in { min-height: 68px !important; }
-  .mobile-menu { display: none !important; }
-}
-
-@media (max-width: 860px) {
-  .nav {
-    top: 12px !important;
-    width: calc(100% - 24px) !important;
-    max-width: calc(100% - 24px) !important;
-    border-radius: 9999px !important;
-  }
-  .nav-in { min-height: 58px !important; padding: 7px 14px !important; gap: 10px !important; }
-  .nav-logo { width: 96px !important; height: 44px !important; }
-  .nav-links { display: none !important; }
-  .nav-right { gap: 7px !important; }
-  .cart-btn, .burger { width: 40px !important; height: 40px !important; flex-basis: 40px !important; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .nav { animation: none !important; transition: none !important; }
-  .nav-links a, .nav-links a::after, .cart-btn, .burger { transition: none !important; }
-}
+/* FEMI9 floating navigation — desktop + mobile */
+.nav{position:fixed!important;top:18px!important;left:50%!important;transform:translateX(-50%)!important;width:min(1340px,calc(100% - 40px))!important;max-width:calc(100% - 40px)!important;margin:0!important;border-radius:9999px!important;overflow:visible!important;background:rgba(60,42,94,.72)!important;backdrop-filter:blur(22px) saturate(170%)!important;-webkit-backdrop-filter:blur(22px) saturate(170%)!important;border:1px solid rgba(255,255,255,.20)!important;box-shadow:0 12px 34px rgba(25,14,48,.20),inset 0 1px 0 rgba(255,255,255,.20)!important;z-index:1000!important;animation:navFloatEntrance .5s cubic-bezier(.16,1,.3,1) forwards!important;transition:background .3s ease,border-color .3s ease,box-shadow .3s ease,top .3s ease!important}
+@keyframes navFloatEntrance{from{opacity:0;transform:translate(-50%,-12px)}to{opacity:1;transform:translate(-50%,0)}}
+.nav.scrolled{top:12px!important;background:rgba(42,29,72,.86)!important;backdrop-filter:blur(24px) saturate(185%)!important;-webkit-backdrop-filter:blur(24px) saturate(185%)!important;border-color:rgba(255,255,255,.24)!important;box-shadow:0 15px 42px rgba(18,9,39,.28),inset 0 1px 0 rgba(255,255,255,.22)!important}
+.nav-in{min-height:68px!important;padding:9px 22px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:28px!important}
+.nav-logo{flex:0 0 auto!important;display:flex!important;align-items:center!important;padding:0!important;width:116px!important;height:48px!important;overflow:hidden!important}
+.nav-links{flex:1 1 auto!important;display:flex!important;justify-content:center!important;align-items:center!important;gap:clamp(4px,1vw,14px)!important}
+.nav-links a{position:relative!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:40px!important;padding:7px 13px!important;border-radius:9999px!important;color:rgba(255,255,255,.78)!important;font-size:14px!important;font-weight:500!important;letter-spacing:.005em!important;opacity:1!important;background:transparent!important;text-shadow:none!important;transform:none!important;transition:color .22s ease,background-color .22s ease,box-shadow .22s ease!important}
+.nav-links a::after{content:'';position:absolute;left:50%;bottom:4px;width:0;height:2px;border-radius:999px;background:rgba(255,255,255,.92);transform:translateX(-50%);transition:width .22s cubic-bezier(.2,.7,.2,1)!important}
+.nav-links a:hover,.nav-links a:focus-visible{color:#fff!important;background:rgba(255,255,255,.12)!important;text-shadow:none!important;transform:none!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 4px 14px rgba(15,7,32,.08)!important}
+.nav-links a:hover::after,.nav-links a:focus-visible::after{width:18px}
+.nav-links a:focus-visible{outline:2px solid rgba(255,255,255,.55)!important;outline-offset:2px}
+.nav-right{flex:0 0 auto!important;display:flex!important;align-items:center!important;gap:9px!important}
+.cart-btn,.burger{position:relative!important;width:42px!important;height:42px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 42px!important;border-radius:50%!important;background:rgba(255,255,255,.10)!important;border:1px solid rgba(255,255,255,.18)!important;color:#fff!important;box-shadow:none!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important;transition:background .22s ease,border-color .22s ease,transform .22s cubic-bezier(.2,.7,.2,1),box-shadow .22s ease!important}
+.cart-btn:hover,.burger:hover{background:rgba(255,255,255,.18)!important;border-color:rgba(255,255,255,.34)!important;transform:translateY(-1px)!important;box-shadow:0 7px 18px rgba(15,7,32,.16)!important}
+.cart-btn:active,.burger:active{transform:scale(.97)!important}
+.cart-btn:focus-visible,.burger:focus-visible{outline:2px solid rgba(255,255,255,.6)!important;outline-offset:3px}
+.cart-count{background:#f2a93b!important;color:#2a1d45!important;font-weight:700!important;box-shadow:0 2px 8px rgba(242,169,59,.4)!important}
+.mobile-menu{top:calc(100% + 10px)!important;border-radius:22px!important;background:rgba(45,32,85,.94)!important;backdrop-filter:blur(24px) saturate(190%)!important;-webkit-backdrop-filter:blur(24px) saturate(190%)!important;border:1px solid rgba(255,255,255,.20)!important;box-shadow:0 18px 44px rgba(20,10,45,.30)!important;padding:14px!important}
+@media (min-width:861px){.nav{width:min(1340px,calc(100% - 40px))!important;max-width:calc(100% - 40px)!important;border-radius:9999px!important}.nav-in{min-height:68px!important}.mobile-menu{display:none!important}}
+@media (max-width:860px){.nav{top:12px!important;width:calc(100% - 24px)!important;max-width:calc(100% - 24px)!important;border-radius:9999px!important}.nav-in{min-height:58px!important;padding:7px 14px!important;gap:10px!important}.nav-logo{width:96px!important;height:44px!important}.nav-links{display:none!important}.nav-right{gap:7px!important}.cart-btn,.burger{width:40px!important;height:40px!important;flex-basis:40px!important}}
+@media (prefers-reduced-motion:reduce){.nav{animation:none!important;transition:none!important}.nav-links a,.nav-links a::after,.cart-btn,.burger{transition:none!important}}
