@@ -1,0 +1,44 @@
+name: Apply Femi9 UI fix
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch UI
+        shell: python
+        run: |
+          from pathlib import Path
+
+          nav = Path('src/styles/craft-nav.css')
+          s = nav.read_text()
+          s = s.replace('border-radius: 12px !important;\n  color: rgba(255,255,255,.78)', 'border-radius: 9999px !important;\n  color: rgba(255,255,255,.78)')
+          s = s.replace('/* Refined hover: no glow, no jumping pill. A quiet translucent surface plus\n   an animated underline gives the navigation a more deliberate Apple-like feel. */', '/* Apple-style pill hover: the hover surface follows the same capsule language as the navbar. */')
+          s = s.replace("background: rgba(255,255,255,.09) !important;\n  text-shadow: none !important;\n  transform: none !important;", "background: rgba(255,255,255,.12) !important;\n  text-shadow: none !important;\n  transform: none !important;\n  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 4px 14px rgba(15,7,32,.08) !important;")
+          nav.write_text(s)
+
+          home = Path('src/screens/Home.tsx')
+          s = home.read_text()
+          old = "const buyNow = () => document.querySelector('#products')?.scrollIntoView({ behavior: 'smooth' })"
+          new = "const buyNow = () => { window.location.href = '/product/p330dw' }"
+          if old not in s:
+              raise SystemExit('Expected hero buyNow handler was not found; refusing to make an unsafe edit.')
+          s = s.replace(old, new, 1)
+          home.write_text(s)
+      - name: Commit changes and remove temporary workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f .github/workflows/one-time-femi9-ui-fix.yml
+          git add src/styles/craft-nav.css src/screens/Home.tsx .github/workflows/one-time-femi9-ui-fix.yml
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: polish nav pill hover and hero buy CTA"
+          git push
