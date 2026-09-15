@@ -105,102 +105,162 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   4. PAD SIZE SLIDER — pad sizes only
-
-   The size choices remain real product links. They are presented as a compact
-   horizontal snap slider with a visible track, so the shopper can drag across
-   sizes without the giant clipped cards from the previous implementation.
-   The pack selector below is intentionally untouched.
+   4. PAD SIZE SLIDER — single track + draggable-looking thumb
    ═══════════════════════════════════════════════════════════════════════════ */
 .pdp-page .pdp-size-run {
+  --size-position: 0%;
+  position: relative;
   display: flex !important;
-  grid-template-columns: none !important;
-  gap: 10px !important;
+  align-items: flex-start;
+  gap: 0 !important;
   width: 100%;
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 2px 0 9px;
-  margin-top: 2px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--lilac) transparent;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: 0;
-  overscroll-behavior-x: contain;
-  touch-action: pan-x;
-  -webkit-overflow-scrolling: touch;
-  cursor: grab;
+  padding: 18px 0 0;
+  margin-top: 4px;
+  overflow: visible !important;
+  background: transparent;
+  scrollbar-width: none;
 }
-.pdp-page .pdp-size-run:active { cursor: grabbing; }
-.pdp-page .pdp-size-run::-webkit-scrollbar { height: 5px; }
-.pdp-page .pdp-size-run::-webkit-scrollbar-track { background: transparent; }
-.pdp-page .pdp-size-run::-webkit-scrollbar-thumb {
-  background: var(--lilac);
+.pdp-page .pdp-size-run::-webkit-scrollbar { display: none; }
+
+/* Neutral rail, then the filled section that stops at the current size. */
+.pdp-page .pdp-size-run::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 24px;
+  height: 5px;
   border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--forest-2) 0%,
+    var(--forest-2) var(--size-position),
+    var(--line) var(--size-position),
+    var(--line) 100%
+  );
+  pointer-events: none;
 }
 
+/* The thumb sits exactly where the selected product sits in the run. */
+.pdp-page .pdp-size-run::after {
+  content: '';
+  position: absolute;
+  left: var(--size-position);
+  top: 26.5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--forest-2);
+  border: 0;
+  box-shadow: 0 2px 7px rgba(45, 30, 70, .2), 0 0 0 2px rgba(255,255,255,.9);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 4;
+  transition: left 180ms var(--cr-ease), transform 180ms var(--cr-ease), box-shadow 180ms var(--cr-ease);
+}
+
+/* The old cards become transparent click targets/labels. They remain real links,
+   so selecting a point on the slider still navigates to that size. */
 .pdp-page .pdp-size-chip {
-  flex: 0 0 calc((100% - 20px) / 3) !important;
-  width: calc((100% - 20px) / 3) !important;
+  position: relative;
+  z-index: 5;
+  flex: 1 1 0 !important;
+  width: auto !important;
   min-width: 0 !important;
-  min-height: 72px !important;
-  box-sizing: border-box;
+  height: auto !important;
+  min-height: 0 !important;
   margin: 0 !important;
-  padding: 12px 8px !important;
+  padding: 22px 4px 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--muted) !important;
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+  text-align: center;
+  text-decoration: none;
+  transform: none !important;
+  cursor: pointer;
+}
+.pdp-page .pdp-size-chip b {
+  font-size: 11px;
+  line-height: 1.15;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pdp-page .pdp-size-chip span {
+  max-width: 100%;
+  font-size: 9px;
+  line-height: 1.15;
+  color: var(--muted);
+  opacity: .9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pdp-page .pdp-size-chip.active {
+  color: var(--forest-2) !important;
+}
+.pdp-page .pdp-size-chip.active b { font-weight: 750; }
+.pdp-page .pdp-size-chip.active span { color: var(--forest-2); opacity: 1; }
+.pdp-page .pdp-size-chip:hover b,
+.pdp-page .pdp-size-chip:focus-visible b { color: var(--forest-2); }
+.pdp-page .pdp-size-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--lilac-tint, rgba(90, 65, 120, .12)) !important;
+  border-radius: 10px !important;
+}
+
+/* Map the active item to the center of the corresponding segment. */
+.pdp-page .pdp-size-run:has(.pdp-size-chip:nth-child(1).active) { --size-position: 0%; }
+.pdp-page .pdp-size-run:has(.pdp-size-chip:nth-child(2).active) { --size-position: 25%; }
+.pdp-page .pdp-size-run:has(.pdp-size-chip:nth-child(3).active) { --size-position: 50%; }
+.pdp-page .pdp-size-run:has(.pdp-size-chip:nth-child(4).active) { --size-position: 75%; }
+.pdp-page .pdp-size-run:has(.pdp-size-chip:nth-child(5).active) { --size-position: 100%; }
+
+/* With fewer than five choices, use the end points / thirds instead. */
+.pdp-page .pdp-size-run:has(.pdp-size-chip:nth-child(2).active):not(:has(.pdp-size-chip:nth-child(3))) { --size-position: 100%; }
+.pdp-page .pdp-size-run:has(.pdp-size-chip:nth-child(2).active):has(.pdp-size-chip:nth-child(3)):not(:has(.pdp-size-chip:nth-child(4))) { --size-position: 50%; }
+.pdp-page .pdp-size-run:has(.pdp-size-chip:nth-child(3).active):has(.pdp-size-chip:nth-child(3)):not(:has(.pdp-size-chip:nth-child(4))) { --size-position: 100%; }
+
+/* Panty sizes keep their existing chip picker — this slider is for pad lengths. */
+.pdp-page .pdp-panty-size-run {
+  overflow-x: auto !important;
+  padding-top: 0 !important;
+}
+.pdp-page .pdp-panty-size-run::before,
+.pdp-page .pdp-panty-size-run::after { display: none; }
+.pdp-page .pdp-panty-size-run .pdp-size-chip {
+  flex: 0 0 auto !important;
+  min-width: 78px !important;
+  min-height: 56px !important;
+  padding: 10px 12px !important;
   border: 1.5px solid var(--line) !important;
   border-radius: 16px !important;
   background: #fff !important;
   color: var(--navy) !important;
   box-shadow: none !important;
-  display: flex !important;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  text-align: center;
-  text-decoration: none;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  transform: none !important;
 }
-.pdp-page .pdp-size-chip b {
-  font-size: 15px;
-  line-height: 1.15;
-}
-.pdp-page .pdp-size-chip span {
-  max-width: 100%;
-  font-size: 10px;
-  color: var(--muted);
-  opacity: 1;
-  white-space: normal;
-  text-align: center;
-  line-height: 1.2;
-}
-.pdp-page .pdp-size-chip.active {
+.pdp-page .pdp-panty-size-run .pdp-size-chip.active {
   border-color: var(--navy) !important;
   background: var(--lilac-tint, #faf8ff) !important;
   color: var(--navy) !important;
-  box-shadow: 0 0 0 1px var(--navy) !important;
-}
-.pdp-page .pdp-size-chip:hover {
-  border-color: var(--lilac) !important;
-  box-shadow: 0 4px 14px rgba(45, 30, 70, .07) !important;
 }
 
 @media (max-width: 900px) {
-  .pdp-page .pdp-size-run {
-    gap: 8px !important;
-    padding-bottom: 9px;
-    scroll-padding-inline: 0;
-  }
-  .pdp-page .pdp-size-chip {
-    flex-basis: calc((100% - 8px) / 2) !important;
-    width: calc((100% - 8px) / 2) !important;
-    min-height: 66px !important;
-    border-radius: 15px !important;
-  }
+  .pdp-page .pdp-size-run { padding-top: 17px; }
+  .pdp-page .pdp-size-run::before { top: 23px; }
+  .pdp-page .pdp-size-run::after { top: 25.5px; width: 17px; height: 17px; }
+  .pdp-page .pdp-size-chip { padding-top: 21px !important; }
+  .pdp-page .pdp-size-chip b { font-size: 10px; }
+  .pdp-page .pdp-size-chip span { font-size: 8px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -216,4 +276,5 @@
     opacity: 0.4;
     transform: none;
   }
+  .pdp-page .pdp-size-run::after { transition: none; }
 }
