@@ -12,58 +12,24 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    1. ACCORDIONS — Product Information / Specifications / Shipping
    ═══════════════════════════════════════════════════════════════════════════ */
-
-/* A <details> collapses to `height: auto`, and `auto` is not an animatable
-   value — which is exactly why these three panels used to snap open. Opting the
-   subtree into `interpolate-size` makes auto interpolable, so ::details-content
-   can be transitioned honestly rather than faked with a hardcoded max-height
-   that clips long spec lists the moment a product gains a row.
-
-   Scoped to .pdp-page, not :root: this changes how EVERY height/width
-   transition to a keyword resolves inside its subtree, and that is not a
-   site-wide behaviour change worth making as a side effect of animating an
-   accordion. */
-.pdp-page {
-  interpolate-size: allow-keywords;
-}
-
+.pdp-page { interpolate-size: allow-keywords; }
 .pdp-page .pdp-accordion-item::details-content {
   block-size: 0;
   overflow: hidden;
-  /* content-visibility is transitioned with allow-discrete so the panel's
-     contents stay hidden from find-in-page and the a11y tree until the open
-     animation actually begins, then flip at the far end of the close. */
   content-visibility: hidden;
-  transition:
-    block-size 340ms var(--cr-ease),
-    content-visibility 340ms var(--cr-ease) allow-discrete;
+  transition: block-size 340ms var(--cr-ease), content-visibility 340ms var(--cr-ease) allow-discrete;
 }
-
 .pdp-page .pdp-accordion-item[open]::details-content {
   block-size: auto;
   content-visibility: visible;
 }
-
-/* Browsers without ::details-content / interpolate-size get no height easing —
-   the panel still opens, it just opens instantly. This fade runs everywhere, so
-   even there the change reads as a transition rather than a jump. It is a
-   separate animation on the BODY precisely so it does not depend on the
-   progressive-enhancement above. */
 .pdp-page .pdp-accordion-item[open] .pdp-accordion-body {
   animation: pdp-acc-body-in 320ms var(--cr-ease) both;
 }
-
 @keyframes pdp-acc-body-in {
   from { opacity: 0; transform: translateY(-6px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-/* ── The +/- marker ─────────────────────────────────────────────────────────
-   app.css swapped `content: "+"` for `content: "\2212"`, and `content` cannot
-   be transitioned — the glyph just changed. This draws the plus from two
-   gradient bars in a single box instead, so collapsing the vertical bar to zero
-   height MORPHS a plus into a minus, and the whole marker can rotate while it
-   does. Same two characters' worth of meaning, now animatable. */
 .pdp-page .pdp-accordion-summary::after {
   content: '';
   width: 13px;
@@ -75,35 +41,18 @@
   color: var(--text-soft, #877d9e);
   transition: transform 340ms var(--cr-ease), background-size 340ms var(--cr-ease);
 }
-
 .pdp-page .pdp-accordion-item[open] .pdp-accordion-summary::after {
-  /* Overrides app.css's `content: "\2212"`, which would otherwise put the glyph
-     back and paint it on top of the bars. */
   content: '';
   transform: rotate(180deg);
   background-size: 13px 1.6px, 1.6px 0;
 }
-
-/* The row is the control, so it gets the affordance — not just the glyph. */
-.pdp-page .pdp-accordion-summary {
-  transition: color 200ms var(--cr-ease);
-}
-
-.pdp-page .pdp-accordion-summary:hover {
-  color: var(--forest-2);
-}
+.pdp-page .pdp-accordion-summary { transition: color 200ms var(--cr-ease); }
+.pdp-page .pdp-accordion-summary:hover { color: var(--forest-2); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    2. FREQUENTLY BOUGHT TOGETHER — reveal the add button on hover
-   Mirrors the catalog grid exactly (see Products.css) so the two card types
-   behave identically: hover-capable pointers get the reveal, touch keeps a
-   permanently reachable control.
    ═══════════════════════════════════════════════════════════════════════════ */
-.pdp-page .related-img-wrap {
-  position: relative;
-  display: block;
-}
-
+.pdp-page .related-img-wrap { position: relative; display: block; }
 .pdp-page .related-quick-add {
   position: absolute;
   left: 50%;
@@ -125,59 +74,25 @@
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(52, 32, 78, 0.18);
   opacity: 0;
-  /* visibility, not just opacity: it keeps the hidden button out of sequential
-     focus until the card is actually focused, so a four-card strip does not add
-     four invisible tab stops. */
   visibility: hidden;
-  transition:
-    opacity 260ms var(--cr-ease),
-    transform 260ms var(--cr-ease),
-    visibility 260ms var(--cr-ease),
-    background-color 200ms ease-out;
+  transition: opacity 260ms var(--cr-ease), transform 260ms var(--cr-ease), visibility 260ms var(--cr-ease), background-color 200ms ease-out;
 }
-
 .pdp-page .related-card:hover .related-quick-add,
 .pdp-page .related-card:focus-within .related-quick-add {
   opacity: 1;
   visibility: visible;
   transform: translate(-50%, 0);
 }
-
-.pdp-page .related-quick-add:hover {
-  background: var(--cr-wash-cream, #fbf6ef);
-}
-
-.pdp-page .related-quick-add:active {
-  transform: translate(-50%, 0) scale(0.98);
-}
-
-/* Touch: :hover never fires, so the reveal can never happen. Hide it outright
-   rather than leaving an invisible tap target sitting over the photo — the
-   card's own link then owns the whole image, as it did before. */
-@media (hover: none) {
-  .pdp-page .related-quick-add {
-    display: none;
-  }
-}
+.pdp-page .related-quick-add:hover { background: var(--cr-wash-cream, #fbf6ef); }
+.pdp-page .related-quick-add:active { transform: translate(-50%, 0) scale(0.98); }
+@media (hover: none) { .pdp-page .related-quick-add { display: none; } }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   3. ADD-TO-BAG CONFIRMATION — keyframes from craft.css
+   3. ADD-TO-BAG CONFIRMATION
    ═══════════════════════════════════════════════════════════════════════════ */
-/* Only the CTA needs this. `.related-quick-add` is already absolutely positioned
-   in section 2, and absolute is itself a containing block for the ::after ring —
-   naming it here would set `position: relative` from a LATER rule of equal
-   specificity, beating that `position: absolute` and dropping the hover button
-   into normal flow. That is exactly the bug this file caused on the catalog
-   card; see the matching note in Products.css. */
-.pdp-page .add-to-bag-btn {
-  position: relative;
-}
-
+.pdp-page .add-to-bag-btn { position: relative; }
 .pdp-page .add-to-bag-btn.is-added,
-.pdp-page .related-quick-add.is-added {
-  animation: cr-add-pop 0.42s var(--cr-ease);
-}
-
+.pdp-page .related-quick-add.is-added { animation: cr-add-pop 0.42s var(--cr-ease); }
 .pdp-page .add-to-bag-btn.is-added::after,
 .pdp-page .related-quick-add.is-added::after {
   content: '';
@@ -186,29 +101,96 @@
   border-radius: inherit;
   border: 2px solid currentColor;
   animation: cr-add-ring 0.62s var(--cr-ease) forwards;
-  /* Decoration that expands past the button's edge; without this it would eat
-     the very click that spawned it. */
   pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. PAD SIZE SLIDER — pad sizes only
+
+   The pad size choices remain normal links, so selecting a size still routes to
+   that product. Visually they become a horizontal snap slider; the pack selector
+   below is intentionally untouched.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.pdp-page .pdp-size-run {
+  display: flex !important;
+  grid-template-columns: none !important;
+  gap: 10px !important;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 2px 12px;
+  margin-top: 2px;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 10px;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  cursor: grab;
+}
+.pdp-page .pdp-size-run::-webkit-scrollbar { display: none; }
+.pdp-page .pdp-size-run:active { cursor: grabbing; }
+
+.pdp-page .pdp-size-chip {
+  width: auto !important;
+  min-width: 180px !important;
+  flex: 0 0 72% !important;
+  min-height: 74px !important;
+  margin: 0 !important;
+  padding: 14px 16px !important;
+  border: 1.5px solid #d1d1d6 !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  color: #211437 !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  transform: none !important;
+}
+.pdp-page .pdp-size-chip b { font-size: 17px; }
+.pdp-page .pdp-size-chip span {
+  font-size: 12px;
+  color: #777;
+  opacity: 1;
+  white-space: normal;
+  text-align: right;
+  line-height: 1.25;
+}
+.pdp-page .pdp-size-chip.active {
+  border-color: #3c2a5e !important;
+  background: #faf8ff !important;
+  color: #211437 !important;
+  box-shadow: 0 0 0 1px #3c2a5e !important;
+}
+.pdp-page .pdp-size-chip:hover {
+  border-color: #8f7aa9 !important;
+  box-shadow: 0 4px 14px rgba(45, 30, 70, .07) !important;
+}
+
+@media (max-width: 900px) {
+  .pdp-page .pdp-size-run {
+    gap: 10px !important;
+    padding: 2px 2px 10px;
+    scroll-padding-inline: 8px;
+  }
+  .pdp-page .pdp-size-chip {
+    flex-basis: 82% !important;
+    min-width: 205px !important;
+    min-height: 68px !important;
+    border-radius: 16px !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .pdp-page .pdp-accordion-item::details-content,
   .pdp-page .pdp-accordion-summary::after,
-  .pdp-page .related-quick-add {
-    transition: none;
-  }
-
-  .pdp-page .pdp-accordion-item[open] .pdp-accordion-body {
-    animation: none;
-  }
-
-  /* Confirmation is kept, motion is not: the ring holds still and simply fades
-     rather than travelling outward. */
+  .pdp-page .related-quick-add { transition: none; }
+  .pdp-page .pdp-accordion-item[open] .pdp-accordion-body { animation: none; }
   .pdp-page .add-to-bag-btn.is-added,
-  .pdp-page .related-quick-add.is-added {
-    animation: none;
-  }
-
+  .pdp-page .related-quick-add.is-added { animation: none; }
   .pdp-page .add-to-bag-btn.is-added::after,
   .pdp-page .related-quick-add.is-added::after {
     animation: none;
